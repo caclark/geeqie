@@ -1007,12 +1007,12 @@ void layout_image_zoom_adjust_at_point(LayoutWindow *lw, gdouble increment, gint
 		{
 		image_zoom_adjust_at_point(lw->full_screen->imd, increment, x, y);
 		}
-
-	if (!connect_zoom) return;
+	if (!connect_zoom && !lw->split_mode) return;
 
 	for (i = 0; i < MAX_SPLIT_IMAGES; i++)
 		{
-		if (lw->split_images[i] && lw->split_images[i] != lw->image)
+		if (lw->split_images[i] && lw->split_images[i] != lw->image &&
+						lw->split_images[i]->mouse_wheel_mode)
 			image_zoom_adjust_at_point(lw->split_images[i], increment, x, y);
 		}
 }
@@ -1672,7 +1672,8 @@ static void layout_image_scroll_cb(ImageWindow *imd, GdkEventScroll *event, gpoi
 		}
 
 
-	if (event->state & GDK_CONTROL_MASK)
+	if ((event->state & GDK_CONTROL_MASK) ||
+				(imd->mouse_wheel_mode && !options->image_lm_click_nav))
 		{
 		switch (event->direction)
 			{
@@ -1722,7 +1723,7 @@ static void layout_image_scroll_cb(ImageWindow *imd, GdkEventScroll *event, gpoi
 		}
 }
 
-static void layout_image_drag_cb(ImageWindow *imd, GdkEventButton *event, gdouble dx, gdouble dy, gpointer data)
+static void layout_image_drag_cb(ImageWindow *imd, GdkEventMotion *event, gdouble dx, gdouble dy, gpointer data)
 {
 	gint i;
 	LayoutWindow *lw = data;
@@ -1793,7 +1794,7 @@ static void layout_image_button_inactive_cb(ImageWindow *imd, GdkEventButton *ev
 
 }
 
-static void layout_image_drag_inactive_cb(ImageWindow *imd, GdkEventButton *event, gdouble dx, gdouble dy, gpointer data)
+static void layout_image_drag_inactive_cb(ImageWindow *imd, GdkEventMotion *event, gdouble dx, gdouble dy, gpointer data)
 {
 	LayoutWindow *lw = data;
 	gint i = image_idx(lw, imd);
@@ -1999,16 +2000,19 @@ static void layout_image_setup_split_common(LayoutWindow *lw, gint n)
 				GList *work = g_list_last(layout_selection_list(lw));
 				gint j = 0;
 
-				if (work) work = work->prev;
-
 				while (work && j < i)
 					{
 					FileData *fd = work->data;
 					work = work->prev;
 
-					j++;
-					if (!fd || !*fd->path) continue;
+					if (!fd || !*fd->path || fd->parent ||
+										fd == lw->split_images[0]->image_fd)
+						{
+						continue;
+						}
 					img_fd = fd;
+
+					j++;
 					}
 				}
 

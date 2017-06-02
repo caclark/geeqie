@@ -79,7 +79,7 @@
           <para>
             Enable this to allow Geeqie to increase the image size for images that are smaller than the current view area when the zoom is set to
             <emphasis>Fit image to window</emphasis>
-            .
+            . The value in the adjoining spin box sets the maximum size permitted in percent i.e. 100% is full-size.
           </para>
         </listitem>
       </varlistentry>
@@ -101,62 +101,6 @@
         </term>
         <listitem>
           <para>Adjusts the step size when zooming in or out on an image. This value corresponds to the percentage of the original image.</para>
-        </listitem>
-      </varlistentry>
-    </variablelist>
-  </section>
-  <section id="Whennewimageisselected">
-    <title>When new image is selected</title>
-    <para>This controls the behavior of the zoom and scroll settings when changing the displayed image.</para>
-    <variablelist>
-      <varlistentry>
-        <term>
-          <guilabel>Zoom to original size</guilabel>
-        </term>
-        <listitem>
-          <para>The new image is set to it's original size.</para>
-        </listitem>
-      </varlistentry>
-      <varlistentry>
-        <term>
-          <guilabel>Fit image to window</guilabel>
-        </term>
-        <listitem>
-          <para>The new image's zoom is changed so that the image will fit within the current view area.</para>
-        </listitem>
-      </varlistentry>
-      <varlistentry>
-        <term>
-          <guilabel>Leave zoom at previous setting</guilabel>
-        </term>
-        <listitem>
-          <para>The zoom setting is unchanged, the new image will be scaled the same as the previous image.</para>
-        </listitem>
-      </varlistentry>
-    </variablelist>
-    <variablelist>
-      <varlistentry>
-        <term>
-          <guilabel>Scroll to top left corner</guilabel>
-        </term>
-        <listitem>
-          <para>The new image is displayed from top left corner.</para>
-        </listitem>
-      </varlistentry>
-      <varlistentry>
-        <term>
-          <guilabel>Scroll to image center</guilabel>
-        </term>
-        <listitem>
-          <para>The new image is centered</para>
-        </listitem>
-      </varlistentry>
-      <varlistentry>
-        <term>
-          <guilabel>Keep the region from previous iamge</guilabel>
-        </term>
-        <listitem>
-          <para>The new image is positioned as the previous one, whenever possible.</para>
         </listitem>
       </varlistentry>
     </variablelist>
@@ -190,11 +134,21 @@
         </listitem>
       </varlistentry>
     </variablelist>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <guilabel>Alpha channel color 1/2</guilabel>
+        </term>
+        <listitem>
+          <para>These two colors define the checkerboard background used when images with an alpha channel are displayed.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
   </section>
   <section id="Convenience">
     <title>Convenience</title>
     <variablelist>
-       <varlistentry>
+      <varlistentry>
         <term>
           <guilabel>Auto rotate proofs using EXIF information</guilabel>
         </term>

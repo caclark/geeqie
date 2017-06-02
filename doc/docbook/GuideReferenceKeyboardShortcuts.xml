@@ -135,7 +135,9 @@
           <row>
             <entry colsep="0">
               <emphasis role="strong">Image viewing</emphasis>
-              (image has keyboard focus)
+              (image has keyboard focus. Refer also to
+              <link linkend="MouseWheelMode">Mouse Wheel Mode</link>
+              )
             </entry>
             <entry colsep="0" />
             <entry colsep="0" />
@@ -665,6 +667,41 @@
             <entry />
             <entry>Toggle slideshow.</entry>
           </row>
+          <row>
+            <entry>
+              <keycap>E</keycap>
+            </entry>
+            <entry />
+            <entry>Split panes horizontal.</entry>
+          </row>
+          <row>
+            <entry>
+              <keycap>U</keycap>
+            </entry>
+            <entry />
+            <entry>Split panes vertical.</entry>
+          </row>
+          <row>
+            <entry>
+              <keycap>Y</keycap>
+            </entry>
+            <entry />
+            <entry>Single pane.</entry>
+          </row>
+          <row>
+            <entry>
+              <code>Alt + Right Arrow</code>
+            </entry>
+            <entry />
+            <entry>Next split pane.</entry>
+          </row>
+          <row>
+            <entry>
+              <code>Alt + Left Arrow</code>
+            </entry>
+            <entry />
+            <entry>Previous split pane.</entry>
+          </row>
         </tbody>
       </tgroup>
     </table>
@@ -1071,6 +1108,13 @@
             </entry>
             <entry />
             <entry>Close window.</entry>
+          </row>
+          <row>
+            <entry />
+            <entry>
+              <code>Ctrl + shift + right-click</code>
+            </entry>
+            <entry>Show debug info.</entry>
           </row>
         </tbody>
       </tgroup>

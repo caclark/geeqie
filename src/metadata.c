@@ -302,7 +302,7 @@ gboolean metadata_write_perform(FileData *fd)
 	g_assert(fd->change);
 
 	if (fd->change->dest &&
-	    strcmp(extension_from_path(fd->change->dest), GQ_CACHE_EXT_METADATA) == 0)
+	    strcmp(registered_extension_from_path(fd->change->dest), GQ_CACHE_EXT_METADATA) == 0)
 		{
 		success = metadata_legacy_write(fd);
 		if (success) metadata_legacy_delete(fd, fd->change->dest);
@@ -833,6 +833,46 @@ gboolean metadata_append_string(FileData *fd, const gchar *key, const char *valu
 		}
 }
 
+gboolean metadata_write_GPS_coord(FileData *fd, const gchar *key, gdouble value)
+{
+	gint deg;
+	gdouble min;
+	gdouble param;
+	char *coordinate;
+	char *ref;
+	gboolean ok = TRUE;
+
+	param = value;
+	if (param < 0)
+		param = -param;
+	deg = param;
+	min = (param * 60) - (deg * 60);
+	if (g_strcmp0(key, "Xmp.exif.GPSLongitude") == 0)
+		if (value < 0)
+			ref = "W";
+		else
+			ref = "E";
+	else if (g_strcmp0(key, "Xmp.exif.GPSLatitude") == 0)
+		if (value < 0)
+			ref = "S";
+		else
+			ref = "N";
+	else
+		{
+		log_printf("unknown GPS parameter key '%s'\n", key);
+		ok = FALSE;
+		}
+
+	if (ok)
+		{
+		coordinate = g_strdup_printf("%i,%lf,%s", deg, min, ref);
+		metadata_write_string(fd, key, coordinate );
+		g_free(coordinate);
+		}
+
+	return ok;
+}
+
 gboolean metadata_append_list(FileData *fd, const gchar *key, const GList *values)
 {
 	GList *list = metadata_read_list(fd, key, METADATA_PLAIN);
@@ -1074,6 +1114,14 @@ gchar *keyword_get_name(GtkTreeModel *keyword_tree, GtkTreeIter *iter)
 	gchar *name;
 	gtk_tree_model_get(keyword_tree, iter, KEYWORD_COLUMN_NAME, &name, -1);
 	return name;
+}
+
+gchar *keyword_get_mark(GtkTreeModel *keyword_tree, GtkTreeIter *iter)
+{
+	gchar *mark_str;
+
+	gtk_tree_model_get(keyword_tree, iter, KEYWORD_COLUMN_MARK, &mark_str, -1);
+	return mark_str;
 }
 
 gchar *keyword_get_casefold(GtkTreeModel *keyword_tree, GtkTreeIter *iter)
@@ -1705,12 +1753,19 @@ static void keyword_tree_node_write_config(GtkTreeModel *keyword_tree, GtkTreeIt
 		{
 		GtkTreeIter children;
 		gchar *name;
+		gchar *mark_str;
 
 		WRITE_NL(); WRITE_STRING("<keyword ");
 		name = keyword_get_name(keyword_tree, &iter);
 		write_char_option(outstr, indent, "name", name);
 		g_free(name);
 		write_bool_option(outstr, indent, "kw", keyword_get_is_keyword(keyword_tree, &iter));
+		mark_str = keyword_get_mark(keyword_tree, &iter);
+		if (mark_str && mark_str[0])
+			{
+			write_char_option(outstr, indent, "mark", mark_str);
+			}
+
 		if (gtk_tree_model_iter_children(keyword_tree, &children, &iter))
 			{
 			WRITE_STRING(">");
@@ -1745,6 +1800,7 @@ GtkTreeIter *keyword_add_from_config(GtkTreeStore *keyword_tree, GtkTreeIter *pa
 {
 	gchar *name = NULL;
 	gboolean is_kw = TRUE;
+	gchar *mark_str = NULL;
 
 	while (*attribute_names)
 		{
@@ -1753,6 +1809,7 @@ GtkTreeIter *keyword_add_from_config(GtkTreeStore *keyword_tree, GtkTreeIter *pa
 
 		if (READ_CHAR_FULL("name", name)) continue;
 		if (READ_BOOL_FULL("kw", is_kw)) continue;
+		if (READ_CHAR_FULL("mark", mark_str)) continue;
 
 		log_printf("unknown attribute %s = %s\n", option, value);
 		}
@@ -1765,6 +1822,13 @@ GtkTreeIter *keyword_add_from_config(GtkTreeStore *keyword_tree, GtkTreeIter *pa
 			gtk_tree_store_append(keyword_tree, &iter, parent);
 			}
 		keyword_set(keyword_tree, &iter, name, is_kw);
+
+		if (mark_str)
+			{
+			meta_data_connect_mark_with_keyword(GTK_TREE_MODEL(keyword_tree),
+											&iter, (gint)atoi(mark_str) - 1);
+			}
+
 		g_free(name);
 		return gtk_tree_iter_copy(&iter);
 		}

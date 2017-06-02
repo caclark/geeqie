@@ -236,6 +236,7 @@ static void config_window_apply(void)
 	options->image.max_window_size = c_options->image.max_window_size;
 	options->image.limit_autofit_size = c_options->image.limit_autofit_size;
 	options->image.max_autofit_size = c_options->image.max_autofit_size;
+	options->image.max_enlargement_size = c_options->image.max_enlargement_size;
 	options->image.use_clutter_renderer = c_options->image.use_clutter_renderer;
 	options->progressive_key_scrolling = c_options->progressive_key_scrolling;
 	options->keyboard_scroll_step = c_options->keyboard_scroll_step;
@@ -297,6 +298,9 @@ static void config_window_apply(void)
 		view_window_colors_update();
 		}
 
+	options->image.alpha_color_1 = c_options->image.alpha_color_1;
+	options->image.alpha_color_2 = c_options->image.alpha_color_2;
+
 	options->fullscreen.screen = c_options->fullscreen.screen;
 	options->fullscreen.clean_flip = c_options->fullscreen.clean_flip;
 	options->fullscreen.disable_saver = c_options->fullscreen.disable_saver;
@@ -334,6 +338,7 @@ static void config_window_apply(void)
 	options->metadata.save_legacy_format = c_options->metadata.save_legacy_format;
 	options->metadata.sync_grouped_files = c_options->metadata.sync_grouped_files;
 	options->metadata.confirm_write = c_options->metadata.confirm_write;
+	options->metadata.sidecar_extended_name = c_options->metadata.sidecar_extended_name;
 	options->metadata.confirm_timeout = c_options->metadata.confirm_timeout;
 	options->metadata.confirm_after_timeout = c_options->metadata.confirm_after_timeout;
 	options->metadata.confirm_on_image_change = c_options->metadata.confirm_on_image_change;
@@ -361,6 +366,10 @@ static void config_window_apply(void)
 	options->stereo.fixed_y1 = c_options->stereo.fixed_y1;
 	options->stereo.fixed_x2 = c_options->stereo.fixed_x2;
 	options->stereo.fixed_y2 = c_options->stereo.fixed_y2;
+
+	options->info_keywords.height = c_options->info_keywords.height;
+	options->info_title.height = c_options->info_title.height;
+	options->info_comment.height = c_options->info_comment.height;
 
 #ifdef DEBUG
 	set_debug_level(debug_c);
@@ -1409,6 +1418,7 @@ static GtkWidget *scrolled_notebook_page(GtkWidget *notebook, const gchar *title
 static void config_tab_general(GtkWidget *notebook)
 {
 	GtkWidget *vbox;
+	GtkWidget *hbox;
 	GtkWidget *group;
 	GtkWidget *subgroup;
 	GtkWidget *button;
@@ -1463,6 +1473,18 @@ static void config_tab_general(GtkWidget *notebook)
 
 	pref_checkbox_new_int(group, _("Refresh on file change"),
 			      options->update_on_time_change, &c_options->update_on_time_change);
+
+	group = pref_group_new(vbox, FALSE, _("Info sidebar"), GTK_ORIENTATION_VERTICAL);
+	hbox = pref_box_new(group, FALSE, GTK_ORIENTATION_HORIZONTAL, PREF_PAD_SPACE);
+	pref_spin_new_int(hbox, _("Keywords height:"), NULL,
+				 1, 9999, 1,
+				 options->info_keywords.height, &c_options->info_keywords.height);
+	pref_spin_new_int(hbox, _("Title height:"), NULL,
+				 1, 9999, 1,
+				 options->info_title.height, &c_options->info_title.height);
+	pref_spin_new_int(hbox, _("Comment height:"), NULL,
+				 1, 9999, 1,
+				 options->info_comment.height, &c_options->info_comment.height);
 }
 
 /* image tab */
@@ -1474,6 +1496,7 @@ static void config_tab_image(GtkWidget *notebook)
 	GtkWidget *group;
 	GtkWidget *button;
 	GtkWidget *ct_button;
+	GtkWidget *enlargement_button;
 	GtkWidget *table;
 	GtkWidget *spin;
 
@@ -1492,11 +1515,16 @@ static void config_tab_image(GtkWidget *notebook)
 	pref_checkbox_new_int(group, _("Two pass rendering (apply HQ zoom and color correction in second pass)"),
 			      options->image.zoom_2pass, &c_options->image.zoom_2pass);
 
-	pref_checkbox_new_int(group, _("Allow enlargement of image for zoom to fit"),
+	hbox = pref_box_new(group, FALSE, GTK_ORIENTATION_HORIZONTAL, PREF_PAD_SPACE);
+	enlargement_button = pref_checkbox_new_int(hbox, _("Allow enlargement of image for zoom to fit (max. size in %)"),
 			      options->image.zoom_to_fit_allow_expand, &c_options->image.zoom_to_fit_allow_expand);
+	spin = pref_spin_new_int(hbox, NULL, NULL,
+				 100, 999, 1,
+				 options->image.max_enlargement_size, &c_options->image.max_enlargement_size);
+	pref_checkbox_link_sensitivity(enlargement_button, spin);
 
 	hbox = pref_box_new(group, FALSE, GTK_ORIENTATION_HORIZONTAL, PREF_PAD_SPACE);
-	ct_button = pref_checkbox_new_int(hbox, _("Limit image size when autofitting (%):"),
+	ct_button = pref_checkbox_new_int(hbox, _("Limit image size when autofitting (% of window):"),
 					  options->image.limit_autofit_size, &c_options->image.limit_autofit_size);
 	spin = pref_spin_new_int(hbox, NULL, NULL,
 				 10, 150, 1,
@@ -1509,33 +1537,6 @@ static void config_tab_image(GtkWidget *notebook)
 			     G_CALLBACK(zoom_increment_cb), NULL);
 	gtk_spin_button_set_update_policy(GTK_SPIN_BUTTON(spin), GTK_UPDATE_ALWAYS);
 
-	group = pref_group_new(vbox, FALSE, _("When new image is selected:"), GTK_ORIENTATION_HORIZONTAL);
-
-	vbox2 = pref_box_new(group, TRUE, GTK_ORIENTATION_VERTICAL, PREF_PAD_SPACE);
-	c_options->image.zoom_mode = options->image.zoom_mode;
-	button = pref_radiobutton_new(vbox2, NULL, _("Zoom to original size"),
-				      (options->image.zoom_mode == ZOOM_RESET_ORIGINAL),
-				      G_CALLBACK(zoom_mode_cb), GINT_TO_POINTER(ZOOM_RESET_ORIGINAL));
-	button = pref_radiobutton_new(vbox2, button, _("Fit image to window"),
-				      (options->image.zoom_mode == ZOOM_RESET_FIT_WINDOW),
-				      G_CALLBACK(zoom_mode_cb), GINT_TO_POINTER(ZOOM_RESET_FIT_WINDOW));
-	button = pref_radiobutton_new(vbox2, button, _("Leave Zoom at previous setting"),
-				      (options->image.zoom_mode == ZOOM_RESET_NONE),
-				      G_CALLBACK(zoom_mode_cb), GINT_TO_POINTER(ZOOM_RESET_NONE));
-
-	vbox2 = pref_box_new(group, TRUE, GTK_ORIENTATION_VERTICAL, PREF_PAD_SPACE);
-	c_options->image.scroll_reset_method = options->image.scroll_reset_method;
-	button = pref_radiobutton_new(vbox2, NULL, _("Scroll to top left corner"),
-				      (options->image.scroll_reset_method == SCROLL_RESET_TOPLEFT),
-				      G_CALLBACK(scroll_reset_cb), GINT_TO_POINTER(SCROLL_RESET_TOPLEFT));
-	button = pref_radiobutton_new(vbox2, button, _("Scroll to image center"),
-				      (options->image.scroll_reset_method == SCROLL_RESET_CENTER),
-				      G_CALLBACK(scroll_reset_cb), GINT_TO_POINTER(SCROLL_RESET_CENTER));
-	button = pref_radiobutton_new(vbox2, button, _("Keep the region from previous image"),
-				      (options->image.scroll_reset_method == SCROLL_RESET_NOCHANGE),
-				      G_CALLBACK(scroll_reset_cb), GINT_TO_POINTER(SCROLL_RESET_NOCHANGE));
-
-
 	group = pref_group_new(vbox, FALSE, _("Appearance"), GTK_ORIENTATION_VERTICAL);
 
 	pref_checkbox_new_int(group, _("Use custom border color in window mode"),
@@ -1546,6 +1547,17 @@ static void config_tab_image(GtkWidget *notebook)
 
 	pref_color_button_new(group, _("Border color"), &options->image.border_color,
 			      G_CALLBACK(pref_color_button_set_cb), &c_options->image.border_color);
+
+	c_options->image.border_color = options->image.border_color;
+
+	pref_color_button_new(group, _("Alpha channel color 1"), &options->image.alpha_color_1,
+			      G_CALLBACK(pref_color_button_set_cb), &c_options->image.alpha_color_1);
+
+	pref_color_button_new(group, _("Alpha channel color 2"), &options->image.alpha_color_2,
+			      G_CALLBACK(pref_color_button_set_cb), &c_options->image.alpha_color_2);
+
+	c_options->image.alpha_color_1 = options->image.alpha_color_1;
+	c_options->image.alpha_color_2 = options->image.alpha_color_2;
 
 	group = pref_group_new(vbox, FALSE, _("Convenience"), GTK_ORIENTATION_VERTICAL);
 
@@ -1907,6 +1919,9 @@ static void config_tab_metadata(GtkWidget *notebook)
 
 	pref_checkbox_new_int(hbox, _("Ask before writing to image files"),
 			      options->metadata.confirm_write, &c_options->metadata.confirm_write);
+
+	pref_checkbox_new_int(hbox, _("Create sidecar files named image.ext.xmp (as opposed to image.xmp)"),
+			      options->metadata.sidecar_extended_name, &c_options->metadata.sidecar_extended_name);
 
 	group = pref_group_new(vbox, FALSE, _("Step 2 and 3: write to Geeqie private files"), GTK_ORIENTATION_VERTICAL);
 #ifndef HAVE_EXIV2

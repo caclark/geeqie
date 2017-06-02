@@ -105,7 +105,8 @@ enum {
 	PROP_WINDOW_LIMIT,
 	PROP_WINDOW_LIMIT_VALUE,
 	PROP_AUTOFIT_LIMIT,
-	PROP_AUTOFIT_LIMIT_VALUE
+	PROP_AUTOFIT_LIMIT_VALUE,
+	PROP_ENLARGEMENT_LIMIT_VALUE
 };
 
 typedef enum {
@@ -329,6 +330,16 @@ static void pixbuf_renderer_class_init(PixbufRendererClass *class)
 							  100,
 							  G_PARAM_READABLE | G_PARAM_WRITABLE));
 
+	g_object_class_install_property(gobject_class,
+					PROP_ENLARGEMENT_LIMIT_VALUE,
+					g_param_spec_uint("enlargement_limit_value",
+							  "Size increase limit of image when autofitting",
+							  NULL,
+							  100,
+							  999,
+							  500,
+							  G_PARAM_READABLE | G_PARAM_WRITABLE));
+
 
 	signals[SIGNAL_ZOOM] =
 		g_signal_new("zoom",
@@ -530,6 +541,9 @@ static void pixbuf_renderer_set_property(GObject *object, guint prop_id,
 		case PROP_AUTOFIT_LIMIT_VALUE:
 			pr->autofit_limit_size = g_value_get_uint(value);
 			break;
+		case PROP_ENLARGEMENT_LIMIT_VALUE:
+			pr->enlargement_limit_size = g_value_get_uint(value);
+			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
 			break;
@@ -592,6 +606,9 @@ static void pixbuf_renderer_get_property(GObject *object, guint prop_id,
 			break;
 		case PROP_AUTOFIT_LIMIT_VALUE:
 			g_value_set_uint(value, pr->autofit_limit_size);
+			break;
+		case PROP_ENLARGEMENT_LIMIT_VALUE:
+			g_value_set_uint(value, pr->enlargement_limit_size);
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
@@ -1303,9 +1320,9 @@ void pr_render_complete_signal(PixbufRenderer *pr)
 		}
 }
 
-static void pr_drag_signal(PixbufRenderer *pr, GdkEventButton *bevent)
+static void pr_drag_signal(PixbufRenderer *pr, GdkEventMotion *event)
 {
-	g_signal_emit(pr, signals[SIGNAL_DRAG], 0, bevent);
+	g_signal_emit(pr, signals[SIGNAL_DRAG], 0, event);
 }
 
 static void pr_update_pixel_signal(PixbufRenderer *pr)
@@ -1665,6 +1682,17 @@ static gboolean pr_zoom_clamp(PixbufRenderer *pr, gdouble zoom,
 				scale = scale * factor;
 				}
 
+			if (pr->zoom_expand)
+				{
+				gdouble factor = (gdouble)pr->enlargement_limit_size / 100;
+				if (scale > factor)
+					{
+					w = w * factor / scale;
+					h = h * factor / scale;
+					scale = factor;
+					}
+				}
+
 			if (w < 1) w = 1;
 			if (h < 1) h = 1;
 			}
@@ -1723,10 +1751,10 @@ static void pr_zoom_sync(PixbufRenderer *pr, gdouble zoom,
 		}
 
 	if (force) clamp_flags |= PR_ZOOM_INVALIDATE;
+	(void) pr_parent_window_resize(pr, pr->width, pr->height);
 	if (!pr_zoom_clamp(pr, zoom, clamp_flags)) return;
 
 	(void) pr_size_clamp(pr);
-	(void) pr_parent_window_resize(pr, pr->width, pr->height);
 
 	if (force && new)
 		{
@@ -1954,7 +1982,7 @@ void pixbuf_renderer_set_scroll_center(PixbufRenderer *pr, gdouble x, gdouble y)
  *-------------------------------------------------------------------
  */
 
-static gboolean pr_mouse_motion_cb(GtkWidget *widget, GdkEventButton *bevent, gpointer data)
+static gboolean pr_mouse_motion_cb(GtkWidget *widget, GdkEventMotion *event, gpointer data)
 {
 	PixbufRenderer *pr;
 	gint accel;
@@ -1967,25 +1995,25 @@ static gboolean pr_mouse_motion_cb(GtkWidget *widget, GdkEventButton *bevent, gp
 	 * See http://bugzilla.gnome.org/show_bug.cgi?id=587714 for more. */
 	gint x, y;
 #if GTK_CHECK_VERSION(3,0,0)
-	device_manager = gdk_display_get_device_manager(gdk_window_get_display(bevent->window));
+	device_manager = gdk_display_get_device_manager(gdk_window_get_display(event->window));
 	device = gdk_device_manager_get_client_pointer(device_manager);
-	gdk_window_get_device_position(bevent->window, device, &x, &y, NULL);
+	gdk_window_get_device_position(event->window, device, &x, &y, NULL);
 #else
-	gdk_window_get_pointer (bevent->window, &x, &y, NULL);
+	gdk_window_get_pointer (event->window, &x, &y, NULL);
 #endif
-	bevent->x = x;
-	bevent->y = y;
+	event->x = x;
+	event->y = y;
 
 	pr = PIXBUF_RENDERER(widget);
 
 	if (pr->scroller_id)
 		{
-		pr->scroller_xpos = bevent->x;
-		pr->scroller_ypos = bevent->y;
+		pr->scroller_xpos = event->x;
+		pr->scroller_ypos = event->y;
 		}
 
-	pr->x_mouse = bevent->x;
-	pr->y_mouse = bevent->y;
+	pr->x_mouse = event->x;
+	pr->y_mouse = event->y;
 	pr_update_pixel_signal(pr);
 
 	if (!pr->in_drag || !gdk_pointer_is_grabbed()) return FALSE;
@@ -1999,7 +2027,7 @@ static gboolean pr_mouse_motion_cb(GtkWidget *widget, GdkEventButton *bevent, gp
 		widget_set_cursor(widget, GDK_FLEUR);
 		}
 
-	if (bevent->state & GDK_CONTROL_MASK)
+	if (event->state & GDK_CONTROL_MASK)
 		{
 		accel = PR_PAN_SHIFT_MULTIPLIER;
 		}
@@ -2009,19 +2037,19 @@ static gboolean pr_mouse_motion_cb(GtkWidget *widget, GdkEventButton *bevent, gp
 		}
 
 	/* do the scroll */
-	pixbuf_renderer_scroll(pr, (pr->drag_last_x - bevent->x) * accel,
-			       (pr->drag_last_y - bevent->y) * accel);
+	pixbuf_renderer_scroll(pr, (pr->drag_last_x - event->x) * accel,
+			       (pr->drag_last_y - event->y) * accel);
 
-	pr_drag_signal(pr, bevent);
+	pr_drag_signal(pr, event);
 
-	pr->drag_last_x = bevent->x;
-	pr->drag_last_y = bevent->y;
+	pr->drag_last_x = event->x;
+	pr->drag_last_y = event->y;
 
 	/* This is recommended by the GTK+ documentation, but does not work properly.
 	 * Use deprecated way until GTK+ gets a solution for correct motion hint handling:
 	 * http://bugzilla.gnome.org/show_bug.cgi?id=587714
 	 */
-	/* gdk_event_request_motions (bevent); */
+	/* gdk_event_request_motions (event); */
 	return FALSE;
 }
 

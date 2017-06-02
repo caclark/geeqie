@@ -322,6 +322,7 @@ static void write_global_attributes(GString *outstr, gint indent)
 	WRITE_NL(); WRITE_UINT(*options, duplicates_select_type);
 	WRITE_NL(); WRITE_BOOL(*options, duplicates_thumbnails);
 	WRITE_NL(); WRITE_BOOL(*options, rot_invariant_sim);
+	WRITE_NL(); WRITE_BOOL(*options, sort_totals);
 	WRITE_SEPARATOR();
 
 	WRITE_NL(); WRITE_BOOL(*options, mousewheel_scrolls);
@@ -358,6 +359,7 @@ static void write_global_attributes(GString *outstr, gint indent)
 	WRITE_NL(); WRITE_INT(*options, image.max_window_size);
 	WRITE_NL(); WRITE_BOOL(*options, image.limit_autofit_size);
 	WRITE_NL(); WRITE_INT(*options, image.max_autofit_size);
+	WRITE_NL(); WRITE_INT(*options, image.max_enlargement_size);
 	WRITE_NL(); WRITE_UINT(*options, image.scroll_reset_method);
 	WRITE_NL(); WRITE_INT(*options, image.tile_cache_max);
 	WRITE_NL(); WRITE_INT(*options, image.image_cache_max);
@@ -366,6 +368,8 @@ static void write_global_attributes(GString *outstr, gint indent)
 	WRITE_NL(); WRITE_BOOL(*options, image.use_custom_border_color);
 	WRITE_NL(); WRITE_BOOL(*options, image.use_custom_border_color_in_fullscreen);
 	WRITE_NL(); WRITE_COLOR(*options, image.border_color);
+	WRITE_NL(); WRITE_COLOR(*options, image.alpha_color_1);
+	WRITE_NL(); WRITE_COLOR(*options, image.alpha_color_2);
 	WRITE_NL(); WRITE_BOOL(*options, image.use_clutter_renderer);
 
 	/* Thumbnails Options */
@@ -442,6 +446,7 @@ static void write_global_attributes(GString *outstr, gint indent)
 	WRITE_NL(); WRITE_BOOL(*options, metadata.save_legacy_format);
 	WRITE_NL(); WRITE_BOOL(*options, metadata.sync_grouped_files);
 	WRITE_NL(); WRITE_BOOL(*options, metadata.confirm_write);
+	WRITE_NL(); WRITE_BOOL(*options, metadata.sidecar_extended_name);
 	WRITE_NL(); WRITE_INT(*options, metadata.confirm_timeout);
 	WRITE_NL(); WRITE_BOOL(*options, metadata.confirm_after_timeout);
 	WRITE_NL(); WRITE_BOOL(*options, metadata.confirm_on_image_change);
@@ -602,6 +607,7 @@ static gboolean load_global_params(const gchar **attribute_names, const gchar **
 		if (READ_UINT_CLAMP(*options, duplicates_select_type, 0, DUPE_SELECT_GROUP2)) continue;
 		if (READ_BOOL(*options, duplicates_thumbnails)) continue;
 		if (READ_BOOL(*options, rot_invariant_sim)) continue;
+		if (READ_BOOL(*options, sort_totals)) continue;
 
 		if (READ_BOOL(*options, progressive_key_scrolling)) continue;
 		if (READ_UINT_CLAMP(*options, keyboard_scroll_step, 1, 32)) continue;
@@ -629,6 +635,7 @@ static gboolean load_global_params(const gchar **attribute_names, const gchar **
 		if (READ_INT(*options, image.max_window_size)) continue;
 		if (READ_BOOL(*options, image.limit_autofit_size)) continue;
 		if (READ_INT(*options, image.max_autofit_size)) continue;
+		if (READ_INT(*options, image.max_enlargement_size)) continue;
 		if (READ_UINT_CLAMP(*options, image.scroll_reset_method, 0, PR_SCROLL_RESET_COUNT - 1)) continue;
 		if (READ_INT(*options, image.tile_cache_max)) continue;
 		if (READ_INT(*options, image.image_cache_max)) continue;
@@ -639,6 +646,8 @@ static gboolean load_global_params(const gchar **attribute_names, const gchar **
 		if (READ_BOOL(*options, image.use_custom_border_color)) continue;
 		if (READ_BOOL(*options, image.use_custom_border_color_in_fullscreen)) continue;
 		if (READ_COLOR(*options, image.border_color)) continue;
+		if (READ_COLOR(*options, image.alpha_color_1)) continue;
+		if (READ_COLOR(*options, image.alpha_color_2)) continue;
 		if (READ_BOOL(*options, image.use_clutter_renderer)) continue;
 
 		/* Thumbnails options */
@@ -720,6 +729,7 @@ static gboolean load_global_params(const gchar **attribute_names, const gchar **
 		if (READ_BOOL(*options, metadata.save_legacy_format)) continue;
 		if (READ_BOOL(*options, metadata.sync_grouped_files)) continue;
 		if (READ_BOOL(*options, metadata.confirm_write)) continue;
+		if (READ_BOOL(*options, metadata.sidecar_extended_name)) continue;
 		if (READ_BOOL(*options, metadata.confirm_after_timeout)) continue;
 		if (READ_INT(*options, metadata.confirm_timeout)) continue;
 		if (READ_BOOL(*options, metadata.confirm_on_image_change)) continue;
@@ -940,6 +950,22 @@ static void options_parse_pane_exif(GQParserData *parser_data, GMarkupParseConte
 		}
 }
 
+static void options_parse_pane_keywords(GQParserData *parser_data, GMarkupParseContext *context, const gchar *element_name, const gchar **attribute_names, const gchar **attribute_values, gpointer data, GError **error)
+{
+	GtkWidget *pane = data;
+
+	if (g_ascii_strcasecmp(element_name, "expanded") == 0)
+		{
+		bar_pane_keywords_entry_add_from_config(pane, attribute_names, attribute_values);
+		options_parse_func_push(parser_data, options_parse_leaf, NULL, NULL);
+		}
+	else
+		{
+		log_printf("unexpected in <pane_keywords>: <%s>\n", element_name);
+		options_parse_func_push(parser_data, options_parse_leaf, NULL, NULL);
+		}
+}
+
 static void options_parse_bar(GQParserData *parser_data, GMarkupParseContext *context, const gchar *element_name, const gchar **attribute_names, const gchar **attribute_values, gpointer data, GError **error)
 {
 	GtkWidget *bar = data;
@@ -1015,7 +1041,7 @@ static void options_parse_bar(GQParserData *parser_data, GMarkupParseContext *co
 			pane = bar_pane_keywords_new_from_config(attribute_names, attribute_values);
 			bar_add(bar, pane);
 			}
-		options_parse_func_push(parser_data, options_parse_leaf, NULL, NULL);
+		options_parse_func_push(parser_data, options_parse_pane_keywords, NULL, pane);
 		}
 	else if (g_ascii_strcasecmp(element_name, "clear") == 0)
 		{
@@ -1055,12 +1081,17 @@ static void options_parse_layout(GQParserData *parser_data, GMarkupParseContext 
 
 		options_parse_func_push(parser_data, options_parse_bar, NULL, lw->bar);
 		}
+#if 0
+/* FIXME: The sort manager and desktop files are set up in the idle loop.
+ * Setup is not yet completed when the layout is first displayed.
+ */
 	else if (g_ascii_strcasecmp(element_name, "bar_sort") == 0)
 		{
 		GtkWidget *bar = bar_sort_new_from_config(lw, attribute_names, attribute_values);
 		layout_bar_sort_set(lw, bar);
 		options_parse_func_push(parser_data, options_parse_leaf, NULL, NULL);
 		}
+#endif
 	else if (g_ascii_strcasecmp(element_name, "toolbar") == 0)
 		{
 		options_parse_func_push(parser_data, options_parse_toolbar_and_statusbar, NULL, NULL);

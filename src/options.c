@@ -48,6 +48,7 @@ ConfOptions *init_options(ConfOptions *options)
 	options->dnd_icon_size = 48;
 	options->duplicates_similarity_threshold = 99;
 	options->rot_invariant_sim = TRUE;
+	options->sort_totals = FALSE;
 
 	options->file_filter.disable = FALSE;
 	options->file_filter.show_dot_directory = FALSE;
@@ -77,6 +78,15 @@ ConfOptions *init_options(ConfOptions *options)
 	options->fullscreen.screen = -1;
 
 	memset(&options->image.border_color, 0, sizeof(options->image.border_color));
+	memset(&options->image.alpha_color_1, 0, sizeof(options->image.alpha_color_1));
+	memset(&options->image.alpha_color_2, 0, sizeof(options->image.alpha_color_2));
+/* alpha channel checkerboard background (same as gimp) */
+	options->image.alpha_color_1.red = 0x009999;
+	options->image.alpha_color_1.green = 0x009999;
+	options->image.alpha_color_1.blue = 0x009999;
+	options->image.alpha_color_2.red = 0x006666;
+	options->image.alpha_color_2.green = 0x006666;
+	options->image.alpha_color_2.blue = 0x006666;
 	options->image.enable_read_ahead = TRUE;
 	options->image.exif_rotate_enable = TRUE;
 	options->image.exif_proof_rotate_enable = TRUE;
@@ -84,6 +94,7 @@ ConfOptions *init_options(ConfOptions *options)
 	options->image.limit_autofit_size = FALSE;
 	options->image.limit_window_size = TRUE;
 	options->image.max_autofit_size = 100;
+	options->image.max_enlargement_size = 900;
 	options->image.max_window_size = 90;
 	options->image.scroll_reset_method = SCROLL_RESET_NOCHANGE;
 	options->image.tile_cache_max = 10;
@@ -131,6 +142,7 @@ ConfOptions *init_options(ConfOptions *options)
 	options->metadata.confirm_on_dir_change = TRUE;
 	options->metadata.keywords_case_sensitive = FALSE;
 	options->metadata.write_orientation = TRUE;
+	options->metadata.sidecar_extended_name = FALSE;
 
 	options->show_icon_names = TRUE;
 
@@ -227,6 +239,7 @@ LayoutOptions *init_layout_options(LayoutOptions *options)
 	options->main_window.w = 720;
 	options->main_window.x = 0;
 	options->main_window.y = 0;
+	options->folder_window.vdivider_pos = 100;
 	options->order = g_strdup("123");
 	options->show_directory_date = FALSE;
 	options->show_marks = FALSE;

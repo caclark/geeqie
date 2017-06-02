@@ -45,6 +45,7 @@ struct _ConfOptions
 	gboolean duplicates_thumbnails;
 	guint duplicates_select_type;
 	gboolean rot_invariant_sim;
+	gboolean sort_totals;
 
 	gint open_recent_list_maxsize;
 	gint dnd_icon_size;
@@ -52,6 +53,19 @@ struct _ConfOptions
 	gboolean save_window_positions;
 	gboolean use_saved_window_positions_for_new_windows;
 	gboolean tools_restore_state;
+
+	/* info sidebar component heights */
+	struct {
+		gint height;
+	} info_comment;
+
+	struct {
+		gint height;
+	} info_keywords;
+
+	struct {
+		gint height;
+	} info_title;
 
 	/* file ops */
 	struct {
@@ -74,6 +88,7 @@ struct _ConfOptions
 		gint max_window_size;
 		gboolean limit_autofit_size;
 		gint max_autofit_size;
+		gint max_enlargement_size;
 
 		gint tile_cache_max;	/* in megabytes */
 		gint image_cache_max;   /* in megabytes */
@@ -89,6 +104,8 @@ struct _ConfOptions
 		gboolean use_custom_border_color_in_fullscreen;
 		gboolean use_custom_border_color;
 		GdkColor border_color;
+		GdkColor alpha_color_1;
+		GdkColor alpha_color_2;
 	} image;
 
 	/* thumbnails */
@@ -210,6 +227,7 @@ struct _ConfOptions
 		gboolean confirm_on_dir_change;
 		gboolean keywords_case_sensitive;
 		gboolean write_orientation;
+		gboolean sidecar_extended_name;
 	} metadata;
 
 	/* Stereo */

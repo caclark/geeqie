@@ -637,12 +637,20 @@ static void layout_menu_list_cb(GtkRadioAction *action, GtkRadioAction *current,
 	layout_views_set(lw, lw->options.dir_view_type, (FileViewType) gtk_radio_action_get_current_value(action));
 }
 
-static void layout_menu_view_dir_as_cb(GtkRadioAction *action, GtkRadioAction *current, gpointer data)
+static void layout_menu_view_dir_as_cb(GtkToggleAction *action,  gpointer data)
 {
 	LayoutWindow *lw = data;
 
 	layout_exit_fullscreen(lw);
-	layout_views_set(lw, (DirViewType) gtk_radio_action_get_current_value(action), lw->options.file_view_type);
+
+	if (gtk_toggle_action_get_active(action))
+		{
+		layout_views_set(lw, DIRVIEW_TREE, lw->options.file_view_type);
+		}
+	else
+		{
+		layout_views_set(lw, DIRVIEW_LIST, lw->options.file_view_type);
+		}
 }
 
 static void layout_menu_view_in_new_window_cb(GtkAction *action, gpointer data)
@@ -1219,6 +1227,46 @@ static void layout_menu_image_next_cb(GtkAction *action, gpointer data)
 	layout_image_next(lw);
 }
 
+static void layout_menu_split_pane_next_cb(GtkAction *action, gpointer data)
+{
+	LayoutWindow *lw = data;
+	gint active_frame;
+
+	active_frame = lw->active_split_image;
+
+	if (active_frame < MAX_SPLIT_IMAGES-1 && lw->split_images[active_frame+1] )
+		{
+		active_frame++;
+		}
+	else
+		{
+		active_frame = 0;
+		}
+	layout_image_activate(lw, active_frame, FALSE);
+}
+
+static void layout_menu_split_pane_prev_cb(GtkAction *action, gpointer data)
+{
+	LayoutWindow *lw = data;
+	gint active_frame;
+
+	active_frame = lw->active_split_image;
+
+	if (active_frame >=1 && lw->split_images[active_frame-1] )
+		{
+		active_frame--;
+		}
+	else
+		{
+		active_frame = MAX_SPLIT_IMAGES-1;
+		while (!lw->split_images[active_frame])
+			{
+			active_frame--;
+			}
+		}
+	layout_image_activate(lw, active_frame, FALSE);
+}
+
 static void layout_menu_image_last_cb(GtkAction *action, gpointer data)
 {
 	LayoutWindow *lw = data;
@@ -1587,6 +1635,8 @@ static GtkActionEntry menu_entries[] = {
   { "LogWindow",	NULL,			N_("_Log Window"),			NULL,			N_("Log Window"),			CB(layout_menu_log_window_cb) },
   { "ExifWin",		NULL,			N_("_Exif window"),			"<control>E",		N_("Exif window"),			CB(layout_menu_bar_exif_cb) },
   { "StereoCycle",	NULL,			N_("_Cycle through stereo modes"),	NULL,			N_("Cycle through stereo modes"),	CB(layout_menu_stereo_mode_next_cb) },
+  { "SplitNextPane",	NULL,			N_("_Next Pane"),	"<alt>Right",			N_("Next Pane"),	CB(layout_menu_split_pane_next_cb) },
+  { "SplitPreviousPane",	NULL,			N_("_Previous Pane"),	"<alt>Left",			N_("Previous Pane"),	CB(layout_menu_split_pane_prev_cb) },
 
 };
 
@@ -1614,9 +1664,8 @@ static GtkRadioActionEntry menu_radio_entries[] = {
   { "ViewIcons",	NULL,			N_("I_cons"),				"<control>I",		N_("View Images as Icons"),		FILEVIEW_ICON }
 };
 
-static GtkRadioActionEntry menu_view_dir_radio_entries[] = {
-  { "FolderList",	NULL,			N_("Folder Li_st"),			"<meta>L",		N_("View Folders as List"), 		DIRVIEW_LIST },
-  { "FolderTree",	NULL,			N_("Folder T_ree"),			"<control>T",		N_("View Folders as Tree"), 		DIRVIEW_TREE },
+static GtkToggleActionEntry menu_view_dir_toggle_entries[] = {
+  { "FolderTree",	NULL,			N_("T_oggle Folder View"),			"<control>T",		N_("Toggle Folders View"), 		CB(layout_menu_view_dir_as_cb),FALSE },
 };
 
 static GtkRadioActionEntry menu_split_radio_entries[] = {
@@ -1749,7 +1798,6 @@ static const gchar *menu_ui_description =
 "      <placeholder name='WindowSection'/>"
 "      <separator/>"
 "      <menu action='FileDirMenu'>"
-"        <menuitem action='FolderList'/>"
 "        <menuitem action='FolderTree'/>"
 "        <placeholder name='FolderSection'/>"
 "        <separator/>"
@@ -1797,6 +1845,9 @@ static const gchar *menu_ui_description =
 "        <menuitem action='SplitVertical'/>"
 "        <menuitem action='SplitQuad'/>"
 "        <menuitem action='SplitSingle'/>"
+"        <separator/>"
+"        <menuitem action='SplitNextPane'/>"
+"        <menuitem action='SplitPreviousPane'/>"
 "      </menu>"
 "      <menu action='StereoMenu'>"
 "        <menuitem action='StereoAuto'/>"
@@ -2175,9 +2226,9 @@ void layout_actions_setup(LayoutWindow *lw)
 	gtk_action_group_add_radio_actions(lw->action_group,
 					   menu_split_radio_entries, G_N_ELEMENTS(menu_split_radio_entries),
 					   0, G_CALLBACK(layout_menu_split_cb), lw);
-	gtk_action_group_add_radio_actions(lw->action_group,
-					   menu_view_dir_radio_entries, DIRVIEW_LAST + 1 /* count */,
-					   0, G_CALLBACK(layout_menu_view_dir_as_cb), lw);
+	gtk_action_group_add_toggle_actions(lw->action_group,
+					   menu_view_dir_toggle_entries, G_N_ELEMENTS(menu_view_dir_toggle_entries),
+					    lw);
 	gtk_action_group_add_radio_actions(lw->action_group,
 					   menu_color_radio_entries, COLOR_PROFILE_FILE + COLOR_PROFILE_INPUTS,
 					   0, G_CALLBACK(layout_color_menu_input_cb), lw);
@@ -2453,10 +2504,15 @@ static void layout_util_sync_views(LayoutWindow *lw)
 	if (!lw->action_group) return;
 
 	action = gtk_action_group_get_action(lw->action_group, "FolderTree");
-	gtk_radio_action_set_current_value(GTK_RADIO_ACTION(action), lw->options.dir_view_type);
+	gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), lw->options.dir_view_type);
 
 	action = gtk_action_group_get_action(lw->action_group, "SplitSingle");
 	gtk_radio_action_set_current_value(GTK_RADIO_ACTION(action), lw->split_mode);
+
+	action = gtk_action_group_get_action(lw->action_group, "SplitNextPane");
+	gtk_action_set_sensitive(action, !(lw->split_mode == SPLIT_NONE));
+	action = gtk_action_group_get_action(lw->action_group, "SplitPreviousPane");
+	gtk_action_set_sensitive(action, !(lw->split_mode == SPLIT_NONE));
 
 	action = gtk_action_group_get_action(lw->action_group, "ViewIcons");
 	gtk_radio_action_set_current_value(GTK_RADIO_ACTION(action), lw->options.file_view_type);

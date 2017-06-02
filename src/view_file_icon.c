@@ -1161,6 +1161,16 @@ static void vficon_set_focus(ViewFile *vf, IconData *id)
 			{
 			/* ensure focus row col are correct */
 			vficon_find_position(vf, VFICON(vf)->focus_id, &VFICON(vf)->focus_row, &VFICON(vf)->focus_column);
+#if GTK_CHECK_VERSION(3,0,0)
+/* FIXME: Refer to issue #467 on Github. The thumbnail position is not
+ * preserved when the icon view is refreshed. Caused by an unknown call from
+ * the idle loop. This patch hides the problem.
+ */
+			if (vficon_find_iter(vf, VFICON(vf)->focus_id, &iter, NULL))
+				{
+				tree_view_row_make_visible(GTK_TREE_VIEW(vf->listview), &iter, FALSE);
+				}
+#endif
 			return;
 			}
 		vficon_selection_remove(vf, VFICON(vf)->focus_id, SELECTION_FOCUS, NULL);
@@ -1372,12 +1382,12 @@ gboolean vficon_press_key_cb(GtkWidget *widget, GdkEventKey *event, gpointer dat
  *-------------------------------------------------------------------
  */
 
-static gboolean vficon_motion_cb(GtkWidget *widget, GdkEventButton *bevent, gpointer data)
+static gboolean vficon_motion_cb(GtkWidget *widget, GdkEventMotion *event, gpointer data)
 {
 	ViewFile *vf = data;
 	IconData *id;
 
-	id = vficon_find_data_by_coord(vf, (gint)bevent->x, (gint)bevent->y, NULL);
+	id = vficon_find_data_by_coord(vf, (gint)event->x, (gint)event->y, NULL);
 	tip_update(vf, id);
 
 	return FALSE;

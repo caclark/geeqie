@@ -1,7 +1,8 @@
 /*
+ * Copyright (C) 2004 John Ellis
  * Copyright (C) 2008 - 2016 The Geeqie Team
  *
- * Authors: Vladimir Nadvornik, Laurent Monin
+ * Author: John Ellis
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,15 +19,10 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef MISC_H
-#define MISC_H
+#ifndef SHORTCUTS_H
+#define SHORTCUTS_H
 
-gdouble get_zoom_increment(void);
-gchar *utf8_validate_or_convert(const gchar *text);
-gint utf8_compare(const gchar *s1, const gchar *s2, gboolean case_sensitive);
-gchar *expand_tilde(const gchar *filename);
-int runcmd(gchar *cmd);
-gchar *decode_geo_parameters(const gchar *input_text);
+GtkWidget *shortcuts_new_default(LayoutWindow *lw);
 
-#endif /* MISC_H */
+#endif
 /* vim: set shiftwidth=8 softtabstop=0 cindent cinoptions={1s: */

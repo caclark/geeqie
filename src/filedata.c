@@ -427,6 +427,7 @@ static FileData *file_data_new(const gchar *path_utf8, struct stat *st, gboolean
 	fd->mode = st->st_mode;
 	fd->ref = 1;
 	fd->magick = FD_MAGICK;
+	fd->exifdate = 0;
 
 	if (disable_sidecars) fd->disable_grouping = TRUE;
 
@@ -463,21 +464,6 @@ FileData *file_data_new_simple(const gchar *path_utf8)
 		}
 
 	return fd;
-}
-
-void init_exif_time_data(GList *files)
-{
-	FileData *file;
-	DEBUG_1("%s init_exif_time_data: ...", get_exec_time());
-	while (files)
-		{
-		file = files->data;
-
-		if (file)
-			file->exifdate = 0;
-
-		files = files->next;
-		}
 }
 
 void read_exif_time_data(FileData *file)
@@ -605,6 +591,7 @@ static void file_data_free(FileData *fd)
 	g_free(fd->original_path);
 	g_free(fd->collate_key_name);
 	g_free(fd->collate_key_name_nocase);
+	g_free(fd->extended_extension);
 	if (fd->thumb_pixbuf) g_object_unref(fd->thumb_pixbuf);
 	histmap_free(fd->histmap);
 
@@ -932,6 +919,8 @@ static void file_data_disconnect_sidecar_file(FileData *target, FileData *sfd)
 
 	target->sidecar_files = g_list_remove(target->sidecar_files, sfd);
 	sfd->parent = NULL;
+	g_free(sfd->extended_extension);
+	sfd->extended_extension = NULL;
 
 	file_data_unref(target);
 	file_data_unref(sfd);
@@ -1119,6 +1108,37 @@ static GList * file_data_basename_hash_insert(GHashTable *basename_hash, FileDat
 
 	list = g_hash_table_lookup(basename_hash, basename);
 
+	if (!list)
+		{
+		DEBUG_1("TG: basename_hash not found for %s",fd->path);
+		const gchar *parent_extension = registered_extension_from_path(basename);
+
+		if (parent_extension)
+			{
+			DEBUG_1("TG: parent extension %s",parent_extension);
+			gchar *parent_basename = g_strndup(basename, parent_extension - basename);
+			DEBUG_1("TG: parent basename %s",parent_basename);
+			FileData *parent_fd = g_hash_table_lookup(file_data_pool, basename);
+			if (parent_fd)
+				{
+				DEBUG_1("TG: parent fd found");
+				list = g_hash_table_lookup(basename_hash, parent_basename);
+				if (!g_list_find(list, parent_fd))
+					{
+					DEBUG_1("TG: parent fd doesn't fit");
+					g_free(parent_basename);
+					list = NULL;
+					}
+				else
+					{
+					g_free(basename);
+					basename = parent_basename;
+					fd->extended_extension = g_strconcat(parent_extension, fd->extension, NULL);
+					}
+				}
+			}
+		}
+
 	if (!g_list_find(list, fd))
 		{
 		list = g_list_insert_sorted(list, file_data_ref(fd), file_data_sort_by_ext);
@@ -1129,6 +1149,11 @@ static GList * file_data_basename_hash_insert(GHashTable *basename_hash, FileDat
 		g_free(basename);
 		}
 	return list;
+}
+
+static void file_data_basename_hash_insert_cb(gpointer fd, gpointer basename_hash)
+{
+	file_data_basename_hash_insert((GHashTable *)basename_hash, (FileData *)fd);
 }
 
 static void file_data_basename_hash_remove_list(gpointer key, gpointer value, gpointer data)
@@ -1195,6 +1220,7 @@ static gboolean filelist_read_real(const gchar *dir_path, GList **files, GList *
 	gchar *pathl;
 	GList *dlist = NULL;
 	GList *flist = NULL;
+	GList *xmp_files = NULL;
 	gint (*stat_func)(const gchar *path, struct stat *buf);
 	GHashTable *basename_hash = NULL;
 
@@ -1252,7 +1278,10 @@ static gboolean filelist_read_real(const gchar *dir_path, GList **files, GList *
 					flist = g_list_prepend(flist, fd);
 					if (fd->sidecar_priority && !fd->disable_grouping)
 						{
-						file_data_basename_hash_insert(basename_hash, fd);
+						if (strcmp(fd->extension, ".xmp") != 0)
+							file_data_basename_hash_insert(basename_hash, fd);
+						else
+							xmp_files = g_list_append(xmp_files, fd);
 						}
 					}
 				}
@@ -1271,6 +1300,12 @@ static gboolean filelist_read_real(const gchar *dir_path, GList **files, GList *
 
 	g_free(pathl);
 
+	if (xmp_files)
+		{
+		g_list_foreach(xmp_files,file_data_basename_hash_insert_cb,basename_hash);
+		g_list_free(xmp_files);
+		}
+
 	if (dirs) *dirs = dlist;
 
 	if (files)
@@ -1280,9 +1315,6 @@ static gboolean filelist_read_real(const gchar *dir_path, GList **files, GList *
 		*files = filelist_filter_out_sidecars(flist);
 		}
 	if (basename_hash) file_data_basename_hash_free(basename_hash);
-
-	// Call a separate function to initialize the exif datestamps for the found files..
-	if (files) init_exif_time_data(*files);
 
 	return TRUE;
 }
@@ -1531,22 +1563,29 @@ gchar *file_data_get_sidecar_path(FileData *fd, gboolean existing_only)
 	if (!file_data_can_write_sidecar(fd)) return NULL;
 
 	work = fd->parent ? fd->parent->sidecar_files : fd->sidecar_files;
+	gchar *extended_extension = g_strconcat(fd->parent ? fd->parent->extension : fd->extension, ".xmp", NULL);
 	while (work)
 		{
 		FileData *sfd = work->data;
 		work = work->next;
-		if (g_ascii_strcasecmp(sfd->extension, ".xmp") == 0)
+		if (g_ascii_strcasecmp(sfd->extension, ".xmp") == 0 || g_ascii_strcasecmp(sfd->extension, extended_extension) == 0)
 			{
 			sidecar_path = g_strdup(sfd->path);
 			break;
 			}
 		}
+	g_free(extended_extension);
 
 	if (!existing_only && !sidecar_path)
 		{
-		gchar *base = g_strndup(fd->path, fd->extension - fd->path);
-		sidecar_path = g_strconcat(base, ".xmp", NULL);
-		g_free(base);
+		if (options->metadata.sidecar_extended_name)
+			sidecar_path = g_strconcat(fd->path, ".xmp", NULL);
+		else
+			{
+			gchar *base = g_strndup(fd->path, fd->extension - fd->path);
+			sidecar_path = g_strconcat(base, ".xmp", NULL);
+			g_free(base);
+			}
 		}
 
 	return sidecar_path;
@@ -1670,7 +1709,7 @@ gboolean file_data_register_mark_func(gint n, FileDataGetMarkFunc get_mark_func,
         file_data_mark_func_data[n] = data;
         file_data_destroy_mark_func[n] = notify;
 
-        if (get_mark_func)
+	if (get_mark_func && file_data_pool)
 		{
 		/* this effectively changes all known files */
 		g_hash_table_foreach(file_data_pool, file_data_notify_mark_func, NULL);
@@ -2095,11 +2134,11 @@ static void file_data_update_ci_dest(FileData *fd, const gchar *dest_path)
 
 static void file_data_update_ci_dest_preserve_ext(FileData *fd, const gchar *dest_path)
 {
-	const gchar *extension = extension_from_path(fd->change->source);
+	const gchar *extension = registered_extension_from_path(fd->change->source);
 	gchar *base = remove_extension_from_path(dest_path);
 	gchar *old_path = fd->change->dest;
 
-	fd->change->dest = g_strconcat(base, extension, NULL);
+	fd->change->dest = g_strconcat(base, fd->extended_extension ? fd->extended_extension : extension, NULL);
 	file_data_update_planned_change_hash(fd, old_path, fd->change->dest);
 
 	g_free(old_path);
@@ -2372,7 +2411,7 @@ gint file_data_verify_ci(FileData *fd, GList *list)
 
 		if (!same)
 			{
-			const gchar *dest_ext = extension_from_path(fd->change->dest);
+			const gchar *dest_ext = registered_extension_from_path(fd->change->dest);
 			if (!dest_ext) dest_ext = "";
 			if (!options->file_filter.disable_file_extension_checks)
 				{
