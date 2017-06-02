@@ -370,6 +370,7 @@ static void config_window_apply(void)
 	options->info_keywords.height = c_options->info_keywords.height;
 	options->info_title.height = c_options->info_title.height;
 	options->info_comment.height = c_options->info_comment.height;
+	options->info_rating.height = c_options->info_rating.height;
 
 #ifdef DEBUG
 	set_debug_level(debug_c);
@@ -1474,17 +1475,20 @@ static void config_tab_general(GtkWidget *notebook)
 	pref_checkbox_new_int(group, _("Refresh on file change"),
 			      options->update_on_time_change, &c_options->update_on_time_change);
 
-	group = pref_group_new(vbox, FALSE, _("Info sidebar"), GTK_ORIENTATION_VERTICAL);
+	group = pref_group_new(vbox, FALSE, _("Info sidebar heights"), GTK_ORIENTATION_VERTICAL);
 	hbox = pref_box_new(group, FALSE, GTK_ORIENTATION_HORIZONTAL, PREF_PAD_SPACE);
-	pref_spin_new_int(hbox, _("Keywords height:"), NULL,
+	pref_spin_new_int(hbox, _("Keywords:"), NULL,
 				 1, 9999, 1,
 				 options->info_keywords.height, &c_options->info_keywords.height);
-	pref_spin_new_int(hbox, _("Title height:"), NULL,
+	pref_spin_new_int(hbox, _("Title:"), NULL,
 				 1, 9999, 1,
 				 options->info_title.height, &c_options->info_title.height);
-	pref_spin_new_int(hbox, _("Comment height:"), NULL,
+	pref_spin_new_int(hbox, _("Comment:"), NULL,
 				 1, 9999, 1,
 				 options->info_comment.height, &c_options->info_comment.height);
+	pref_spin_new_int(hbox, _("Rating:"), NULL,
+				 1, 9999, 1,
+				 options->info_rating.height, &c_options->info_rating.height);
 }
 
 /* image tab */
