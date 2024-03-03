@@ -24,7 +24,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Run Clang Tidy
       uses: "muxee/clang-tidy-action@master"
-      secrets: ["GITHUB_TOKEN"]
+        secrets: ["GITHUB_TOKEN"]
 
   Check-Build-No-Options:
     runs-on: ubuntu-22.04
