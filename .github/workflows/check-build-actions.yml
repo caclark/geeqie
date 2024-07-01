@@ -3,14 +3,14 @@ run-name: ${{ github.actor }} is running Geeqie check build
 on: [push, pull_request]
 jobs:
   Check-Markdown:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
     - name: Run Markdown Lint
       uses: actionshub/markdownlint@main
 
   Check-Shellcheck:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
     - name: Run Shellcheck Lint
@@ -19,7 +19,7 @@ jobs:
         ignore_names: downsize
 
   Check-Build-No-Options:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - run: sudo apt-get update
     - run: sudo apt-get install appstream
@@ -76,7 +76,7 @@ jobs:
         retention-days: 5
 
   Check-Build-Most-Options:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - run: sudo apt-get update
     - run: sudo apt-get install appstream
