@@ -717,7 +717,7 @@ if option.enabled()
 
             should_fail = image_name.startswith('fail')
             test_cmd = [image_test_sh.full_path(), geeqie_exe.full_path(), image]
-            test('Image_ ' + image_name, isolate_test_sh, args: test_cmd, should_fail : should_fail, timeout: 100, suite: ['functional', 'image'])
+            test('Image_ ' + image_name, isolate_test_sh, args: test_cmd, should_fail : should_fail, is_parallel : false, timeout: 100, suite: ['functional', 'image'])
         endforeach
         summary({'Image tests' : ['Test runs:', true]}, section : 'Testing', bool_yn : true)
     else
