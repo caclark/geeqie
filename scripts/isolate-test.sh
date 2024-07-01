@@ -61,4 +61,4 @@ mkdir -p "$XDG_CONFIG_HOME"
 # This will automatically pass the command name and args in the expected order.
 # And `set -e` (above) means that we'll automatically exit with the same return
 # code as our sub-command.
-env -i HOME="$HOME" XDG_CONFIG_HOME="$XDG_CONFIG_HOME" "$@"
+env -i G_DEBUG="fatal-warnings" HOME="$HOME" XDG_CONFIG_HOME="$XDG_CONFIG_HOME" "$@"
