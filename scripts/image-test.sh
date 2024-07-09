@@ -36,16 +36,16 @@ xvfb_pid="$!"
 
 if [ -z "$XDG_CONFIG_HOME" ]
 then
-	config_home="${HOME}/.config"
+    config_home="${HOME}/.config"
 else
-	config_home="$XDG_CONFIG_HOME"
+    config_home="$XDG_CONFIG_HOME"
 fi
 command_fifo="${config_home}/geeqie/.command"
 
 # Wait for remote to initialize
 while [ ! -e "$command_fifo" ] ;
 do
-	sleep 1
+    sleep 1
 done
 
 # We make sure Geeqie can stay alive for 2 seconds after initialization.
@@ -54,32 +54,34 @@ sleep 2
 # Check if Geeqie crashed (which would cause xvfb-run to terminate)
 if ! ps "$xvfb_pid" >/dev/null 2>&1
 then
-	exit 1
+    echo "geeqie crashed during initialization"
+    exit 1
 fi
 
 result=$(xvfb-run --auto-servernum "$geeqie_exe" --remote --get-file-info)
 
-## Teardown: various increasingly-forceful attempts to kill the running geeqie process.
-xvfb-run --auto-servernum "$geeqie_exe" --remote --quit
-
-sleep 1
-
-if ps "$xvfb_pid" >/dev/null 2>&1
+# Check if Geeqie crashed (which would cause xvfb-run to terminate)
+if ! ps "$xvfb_pid" >/dev/null 2>&1
 then
-    echo "Quit command for xvfb geeqie failed for pid ${xvfb_pid}; sending sigterm" >&2
-    kill -TERM "$xvfb_pid"
+    echo "geeqie crashed during remote command procesing"
+    exit 1
+fi
 
-    sleep 1
-    if ps "$xvfb_pid" >/dev/null 2>&1
+xvfb-run --auto-servernum "$geeqie_exe" --remote --quit &
+
+# Timeout is not required. The Meson test timeout will eventually kill the process.
+wait "$xvfb_pid"
+exit_status=$?
+
+if [ "$exit_status" -eq 0 ]
+then
+    if echo "$result" | grep -q "Class: Unknown"
     then
-        echo "kill -TERM failed to stop pid ${xvfb_pid}; sending sigkill" >&2
-        kill -KILL "$xvfb_pid"
+        exit 1
+    else
+        exit 0
     fi
 fi
 
-if echo "$result" | grep -q "Class: Unknown"
-then
-	exit 1
-else
-	exit 0
-fi
+echo "geeqie crashed during shutdown"
+exit "$exit_status"
