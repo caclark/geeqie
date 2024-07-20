@@ -29,7 +29,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
-
+ 
 #include <config.h>
 
 #if HAVE_CLUTTER
