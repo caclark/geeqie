@@ -16,7 +16,7 @@ jobs:
       - run: git fetch --tags --force
       - run: git fetch --depth=1000000
       - name: Set up ARM64 build environment
-        uses: pguyot/arm-runner-action@v2
+        uses: pguyot/arm-runner-action@v2.6.5
         with:
           base_image: ${{ matrix.base_image }}
           cpu: ${{ matrix.cpu }}
