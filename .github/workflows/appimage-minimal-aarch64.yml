@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: |
           yes | sudo apt-get update
-          yes | sudo apt-get install -y wget fuse2 libfuse2
+          yes | sudo apt-get install -y wget fuse libfuse
           yes | sudo apt-get install -y build-essential libgtk-3-dev libgtk-3-bin
           yes | sudo apt-get install -y install curl
           yes | sudo apt-get install -y gettext
@@ -31,7 +31,7 @@ jobs:
           yes | sudo apt-get install -y pandoc
           yes | sudo apt-get install -y python3 python3-pip python3-setuptools  python3-wheel ninja-build
           yes | sudo apt-get install -y yelp-tools
-          yes | sudo apt-get install -y wget fuse libfuse
+          #~ yes | sudo apt-get install -y wget fuse libfuse
 
       - name: Download linuxdeploy and plugins
         run: |
