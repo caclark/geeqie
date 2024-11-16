@@ -109,17 +109,17 @@ jobs:
         #~ with:
           #~ recipe: AppImageBuilderMinimal-aarch64.yml
 
-      - uses: ncipollo/release-action@v1
-        with:
-          allowUpdates: true
-          tag: continuous
-          name: Continuous build
-          prerelease: true
-          artifacts: "*.AppImage"
+    - uses: ncipollo/release-action@v1
+      with:
+        allowUpdates: true
+        tag: continuous
+        name: Continuous build
+        prerelease: true
+        artifacts: "*.AppImage"
 
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: logs-all-build-appimage
-          path: /home/runner/work/geeqie/geeqie/build/meson-logs/*.txt
-          retention-days: 5
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: logs-all-build-appimage
+        path: /home/runner/work/geeqie/geeqie/build/meson-logs/*.txt
+        retention-days: 5
