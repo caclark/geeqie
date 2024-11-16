@@ -54,7 +54,7 @@ jobs:
                 --appdir $GITHUB_WORKSPACE/AppDir \
                 --output appimage                 
               mv Geeqie-aarch64.AppImage Geeqie-minimal-latest-aarch64.AppImage
-              ls -la
+              ls -la build/meson-logs
 
       - uses: ncipollo/release-action@v1
         with:
@@ -68,5 +68,5 @@ jobs:
         if: always()
         with:
           name: logs-all-build-appimage
-          path: ./meson-logs/*.txt
+          path: ./build/meson-logs/*.txt
           retention-days: 5
