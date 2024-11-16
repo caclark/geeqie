@@ -4,61 +4,107 @@ on: [push]
 jobs:
   Build-AppImage:
     runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        arch: [aarch64]
-        include:
-        - arch: aarch64
-          cpu: cortex-a53
-          base_image: raspios_lite_arm64:latest
+    #~ strategy:
+      #~ matrix:
+        #~ arch: [aarch64]
+        #~ include:
+        #~ - arch: aarch64
+          #~ cpu: cortex-a53
+          #~ base_image: raspios_lite_arm64:latest
     steps:
-    - uses: actions/checkout@v4
-    - run: git fetch --tags --force
-    - run: git fetch --depth=1000000
-    - uses: pguyot/arm-runner-action@v2
-      with:
-        base_image: ${{ matrix.base_image }}
-        cpu: ${{ matrix.cpu }}
-        cpu_info: ${{ matrix.cpu_info }}
-        image_additional_mb: 8000
-        bind_mount_repository: false
-        import_github_env: true
-        export_github_env: true
-        copy_artifact_path: geeqie.gz
-        commands: |
-            yes | sudo apt-get update
-            yes | sudo apt-get install build-essential libgtk-3-dev libgtk-3-bin
-            yes | sudo apt-get install curl
-            yes | sudo apt-get install gettext
-            yes | sudo apt-get install git
-            yes | sudo apt-get install meson
-            yes | sudo apt-get install pandoc
-            yes | sudo apt-get install python3 python3-pip python3-setuptools  python3-wheel ninja-build
-            yes | sudo apt-get install yelp-tools
-            mkdir -p $GITHUB_WORKSPACE/AppDir
-            mkdir -p $GITHUB_WORKSPACE/AppDir/usr
-            meson setup -Darchive=disabled -Dcms=disabled -Ddoxygen=disabled -Ddjvu=disabled -Devince=disabled -Dexecinfo=disabled -Dexiv2=disabled -Dgps-map=disabled -Dhelp_pdf=disabled  -Dheif=disabled -Dj2k=disabled -Djpeg=disabled -Djpegxl=disabled -Dlibraw=disabled -Dlua=disabled -Dnpy=disabled -Dpdf=disabled -Dspell=disabled -Dtiff=disabled -Dvideothumbnailer=disabled -Dwebp=disabled -Dprefix=$GITHUB_WORKSPACE/AppDir/usr build
-            ninja -C build install
-            tar -czvf geeqie.gz $GITHUB_WORKSPACE/
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - run: tar -xvf geeqie.gz
-    - run: mkdir -p AppDir
-    - run: cp -var  ./home/runner/work/geeqie/geeqie/AppDir/ .
-    - uses: AppImageCrafters/build-appimage-action@master
-      with:
-        recipe: AppImageBuilderMinimal-aarch64.yml
+    #~ - uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: aarch64
 
-    - uses: ncipollo/release-action@v1
-      with:
-        allowUpdates: true
-        tag: continuous
-        name: Continuous build
-        prerelease: true
-        artifacts: "*.AppImage"
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            git \
+            libglib2.0-dev \
+            python3 \
+            python3-pip \
+            patchelf \
+            wget \
+            libgtk-3-dev \
+            libgtk-3-bin \
+            curl \
+            gettext \
+            meson \
+            pandoc \
+            python3 \
+            python3-pip \
+            python3-setuptools \
+            python3-wheel \
+            ninja-build \
+            yelp-tools
+          # Download linuxdeploy for aarch64
+          wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-aarch64.AppImage
+          chmod +x linuxdeploy-aarch64.AppImage
+          mkdir -p $GITHUB_WORKSPACE/AppDir
+          mkdir -p $GITHUB_WORKSPACE/AppDir/usr
+          git fetch --tags --force
+          git fetch --depth=1000000
+          meson setup -Darchive=disabled -Dcms=disabled -Ddoxygen=disabled -Ddjvu=disabled -Devince=disabled -Dexecinfo=disabled -Dexiv2=disabled -Dgps-map=disabled -Dhelp_pdf=disabled  -Dheif=disabled -Dj2k=disabled -Djpeg=disabled -Djpegxl=disabled -Dlibraw=disabled -Dlua=disabled -Dnpy=disabled -Dpdf=disabled -Dspell=disabled -Dtiff=disabled -Dvideothumbnailer=disabled -Dwebp=disabled -Dprefix=$GITHUB_WORKSPACE/AppDir/usr build
+          ninja -C build install
 
-    - uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: logs-all-build-appimage
-        path: /home/runner/work/geeqie/geeqie/build/meson-logs/*.txt
-        retention-days: 5
+
+      #~ - run: git fetch --tags --force
+      #~ - run: git fetch --depth=1000000
+
+      #~ - uses: pguyot/arm-runner-action@v2
+        #~ with:
+          #~ base_image: ${{ matrix.base_image }}
+          #~ cpu: ${{ matrix.cpu }}
+          #~ cpu_info: ${{ matrix.cpu_info }}
+          #~ image_additional_mb: 8000
+          #~ bind_mount_repository: false
+          #~ import_github_env: true
+          #~ export_github_env: true
+          #~ copy_artifact_path: geeqie.gz
+          #~ commands: |
+              #~ yes | sudo apt-get update
+              #~ yes | sudo apt-get install build-essential libgtk-3-dev libgtk-3-bin
+              #~ yes | sudo apt-get install curl
+              #~ yes | sudo apt-get install gettext
+              #~ yes | sudo apt-get install git
+              #~ yes | sudo apt-get install meson
+              #~ yes | sudo apt-get install pandoc
+              #~ yes | sudo apt-get install python3 python3-pip python3-setuptools  python3-wheel ninja-build
+              #~ yes | sudo apt-get install yelp-tools
+              #~ mkdir -p $GITHUB_WORKSPACE/AppDir
+              #~ mkdir -p $GITHUB_WORKSPACE/AppDir/usr
+              #~ meson setup -Darchive=disabled -Dcms=disabled -Ddoxygen=disabled -Ddjvu=disabled -Devince=disabled -Dexecinfo=disabled -Dexiv2=disabled -Dgps-map=disabled -Dhelp_pdf=disabled  -Dheif=disabled -Dj2k=disabled -Djpeg=disabled -Djpegxl=disabled -Dlibraw=disabled -Dlua=disabled -Dnpy=disabled -Dpdf=disabled -Dspell=disabled -Dtiff=disabled -Dvideothumbnailer=disabled -Dwebp=disabled -Dprefix=$GITHUB_WORKSPACE/AppDir/usr build
+              #~ ninja -C build install
+              #~ tar -czvf geeqie.gz $GITHUB_WORKSPACE/
+              #~ ./linuxdeploy-aarch64.AppImage --appdir AppDir --output appimage
+
+
+      #~ - run: tar -xvf geeqie.gz
+      #~ - run: mkdir -p AppDir
+      #~ - run: cp -var  ./home/runner/work/geeqie/geeqie/AppDir/ .
+      #~ - uses: AppImageCrafters/build-appimage-action@master
+      #~ with:
+      #~ recipe: AppImageBuilderMinimal-aarch64.yml
+
+      - uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          tag: continuous
+          name: Continuous build
+          prerelease: true
+          artifacts: "*.AppImage"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: logs-all-build-appimage
+          path: /home/runner/work/geeqie/geeqie/build/meson-logs/*.txt
+          retention-days: 5
