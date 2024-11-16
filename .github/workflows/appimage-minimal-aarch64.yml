@@ -26,7 +26,9 @@ jobs:
           bind_mount_repository: false
           import_github_env: true
           export_github_env: true
-          copy_artifact_path: *.AppImage;build/meson-logs/*.txt
+          copy_artifact_path: >
+            *.AppImage
+            build/meson-logs/*.txt
           commands: |
               yes | sudo apt-get update
               yes | sudo apt-get install build-essential libgtk-3-dev libgtk-3-bin
