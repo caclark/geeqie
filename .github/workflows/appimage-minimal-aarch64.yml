@@ -12,6 +12,9 @@ jobs:
             cpu: cortex-a53
             base_image: raspios_lite_arm64:latest
     steps:
+      - uses: actions/checkout@v4
+      - run: git fetch --tags --force
+      - run: git fetch --depth=1000000
       - name: Set up ARM64 build environment
         uses: pguyot/arm-runner-action@v2
         with:
