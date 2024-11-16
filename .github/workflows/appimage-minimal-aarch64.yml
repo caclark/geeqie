@@ -66,5 +66,5 @@ jobs:
         if: always()
         with:
           name: logs-all-build-appimage
-          path: *.txt
+          path: "*.txt"
           retention-days: 5
