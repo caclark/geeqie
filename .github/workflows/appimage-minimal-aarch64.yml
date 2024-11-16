@@ -66,5 +66,5 @@ jobs:
         if: always()
         with:
           name: logs-all-build-appimage
-          path: ./build/meson-logs/*.txt
+          path: *.txt
           retention-days: 5
