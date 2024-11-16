@@ -54,6 +54,8 @@ jobs:
           git fetch --depth=1000000
           meson setup -Darchive=disabled -Dcms=disabled -Ddoxygen=disabled -Ddjvu=disabled -Devince=disabled -Dexecinfo=disabled -Dexiv2=disabled -Dgps-map=disabled -Dhelp_pdf=disabled  -Dheif=disabled -Dj2k=disabled -Djpeg=disabled -Djpegxl=disabled -Dlibraw=disabled -Dlua=disabled -Dnpy=disabled -Dpdf=disabled -Dspell=disabled -Dtiff=disabled -Dvideothumbnailer=disabled -Dwebp=disabled -Dprefix=$GITHUB_WORKSPACE/AppDir/usr build
           ninja -C build install
+          ./linuxdeploy-aarch64.AppImage --appdir AppDir --output appimage
+          ls -la
 
 
       #~ - run: git fetch --tags --force
