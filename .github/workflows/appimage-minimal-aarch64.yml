@@ -24,7 +24,7 @@ jobs:
           yes | sudo apt-get update
           yes | sudo apt-get install -y wget fuse
           yes | sudo apt-get install -y build-essential libgtk-3-dev libgtk-3-bin
-          yes | sudo apt-get install -y install curl
+          yes | sudo apt-get install -y curl
           yes | sudo apt-get install -y gettext
           yes | sudo apt-get install -y git
           yes | sudo apt-get install -y meson
@@ -47,7 +47,8 @@ jobs:
         run: |
           tools/linuxdeploy-aarch64.AppImage \
             --appdir AppDir \
-            --output appimage 
+            --output appimage
+          ls -la
 
       #~ - run: git fetch --tags --force
       #~ - run: git fetch --depth=1000000
