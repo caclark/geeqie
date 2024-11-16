@@ -18,6 +18,9 @@ jobs:
           arch: aarch64
           container: ubuntu:24.04
       - uses: actions/checkout@v4
+      - run: git fetch --tags --force
+      - run: git fetch --depth=1000000
+      - run: ls -la
 
       - name: Install dependencies
         run: |
