@@ -26,7 +26,7 @@ jobs:
           bind_mount_repository: false
           import_github_env: true
           export_github_env: true
-          copy_artifact_path: /.Geeqie-aarch64.AppImage
+          copy_artifact_path: Geeqie-aarch64.AppImage
           commands: |
               yes | sudo apt-get update
               yes | sudo apt-get install build-essential libgtk-3-dev libgtk-3-bin
