@@ -21,7 +21,7 @@ jobs:
           base_image: ${{ matrix.base_image }}
           cpu: ${{ matrix.cpu }}
           cpu_info: ${{ matrix.cpu_info }}
-          container: ubuntu:24.04
+          #~ container: ubuntu:24.04
           image_additional_mb: 8000
           bind_mount_repository: false
           import_github_env: true
@@ -48,6 +48,7 @@ jobs:
               meson setup -Darchive=disabled -Dcms=disabled -Ddoxygen=disabled -Ddjvu=disabled -Devince=disabled -Dexecinfo=disabled -Dexiv2=disabled -Dgps-map=disabled -Dhelp_pdf=disabled  -Dheif=disabled -Dj2k=disabled -Djpeg=disabled -Djpegxl=disabled -Dlibraw=disabled -Dlua=disabled -Dnpy=disabled -Dpdf=disabled -Dspell=disabled -Dtiff=disabled -Dvideothumbnailer=disabled -Dwebp=disabled -Dprefix=$GITHUB_WORKSPACE/AppDir/usr build
               ninja -C build install
               tools/linuxdeploy-aarch64.AppImage \
+                --desktop-file $GITHUB_WORKSPACE/AppDir/usr/share/applications/org.geeqie.Geeqie.desktop \
                 --appdir $GITHUB_WORKSPACE/AppDir \
                 --output appimage
               ls -la
