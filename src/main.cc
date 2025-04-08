@@ -105,7 +105,7 @@ namespace
 {
 
 const gchar *option_context_description = _(" \
-All other command line parameters are used as plain files if they exist, or a URL or a folder.\n \
+xx All other command line parameters are used as plain files if they exist, or a URL or a folder.\n \
 The name of a collection, with or without either path or extension (.gqv) may be used.\n\n \
 If more than one folder is on the command line, only the last will be used.\n\n \
 If more than one file is on the command line:\n \
