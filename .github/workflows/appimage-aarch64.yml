@@ -29,6 +29,7 @@ jobs:
             yes | sudo apt-get install libchamplain-gtk-0.12-dev
             yes | sudo apt-get install libdw-dev
             yes | sudo apt-get install libdwarf-dev
+            yes | sudo apt-get install libenchant-2-2
             yes | sudo apt-get install libenchant-2-dev
             yes | sudo apt-get install libffmpegthumbnailer-dev
             yes | sudo apt-get install libgexiv2-dev

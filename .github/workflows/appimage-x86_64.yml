@@ -23,6 +23,7 @@ jobs:
           sudo apt install -y libdjvulibre-dev
           sudo apt install -y libdw-dev
           sudo apt install -y libdwarf-dev
+          sudo apt install -y libenchant-2-2
           sudo apt install -y libenchant-2-dev
           sudo apt install -y libffmpegthumbnailer-dev
           sudo apt install -y libgexiv2-dev
