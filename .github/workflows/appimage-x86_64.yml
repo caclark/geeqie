@@ -89,6 +89,9 @@ jobs:
             --desktop-file ${{ github.workspace }}/AppDir/usr/share/applications/org.geeqie.Geeqie.desktop \
             --plugin gtk \
             --output appimage
+          cp /usr/lib/x86_64-linux-gnu/libglib-2.0.so* ${{ github.workspace }}/AppDir/usr/lib/
+          cp /usr/lib/x86_64-linux-gnu/libgobject-2.0.so* ${{ github.workspace }}/AppDir/usr/lib/
+          cp /usr/lib/x86_64-linux-gnu/libgio-2.0.so* ${{ github.workspace }}/AppDir/usr/lib/
           mv Geeqie-x86_64.AppImage Geeqie-latest-x86_64.AppImage
 
       - name: Create Release
