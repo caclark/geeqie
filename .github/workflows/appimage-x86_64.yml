@@ -16,6 +16,7 @@ jobs:
           sudo apt install -y fop
           sudo apt install -y fuse
           sudo apt install -y gettext
+          sudo apt install -y gvfs
           sudo apt install -y libarchive-dev
           sudo apt install -y libcfitsio-dev
           sudo apt install -y libchamplain-0.12-dev
