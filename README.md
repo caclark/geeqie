@@ -9,7 +9,7 @@ Package Status:
 [![latest packaged version(s)](https://repology.org/badge/latest-versions/geeqie.svg)](https://repology.org/project/geeqie/versions)
 
 ![][image_ref_geeqie_png]
-![](images/geeqie.png)
+![](geeqie.png)
 ## Geeqie - an image viewer
 
 This is Geeqie, a successor of GQview.
