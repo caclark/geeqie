@@ -38,6 +38,7 @@ jobs:
           sudo apt install -y libunwind-dev
           sudo apt install -y libwebp-dev
           sudo apt install -y libwebp7
+          sudo apt install -y meson
           sudo apt install -y pandoc
           sudo apt install -y patchelf
           sudo apt install -y wget
@@ -66,7 +67,7 @@ jobs:
             --prefix=/usr
             --datadir=share
           options: --verbose
-          meson-version: 1.0.1
+          meson-version: 1.3.2
 
       - name: Ninja compile
         run: DESTDIR=${{ github.workspace }}/AppDir ninja -C build install
