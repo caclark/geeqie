@@ -2148,10 +2148,12 @@ static void config_tab_general(GtkWidget *notebook)
 		}
 
 
+DEBUG_0("       "   );
 	net_mon = g_network_monitor_get_default();
 	tz_org = g_network_address_parse_uri(TIMEZONE_DATABASE_WEB, 80, nullptr);
 	if (tz_org)
 		{
+DEBUG_0("       "   );
 		internet_available = g_network_monitor_can_reach(net_mon, tz_org, nullptr, nullptr);
 		g_object_unref(tz_org);
 		}
@@ -2161,6 +2163,7 @@ static void config_tab_general(GtkWidget *notebook)
 
 	if (!internet_available)
 		{
+DEBUG_0("       "   );
 		gtk_widget_set_sensitive(group, FALSE);
 		}
 
@@ -2170,10 +2173,12 @@ static void config_tab_general(GtkWidget *notebook)
 
 	if (isfile(tz->timezone_database_user))
 		{
+DEBUG_0("       "   );
 		button = pref_button_new(GTK_WIDGET(hbox), nullptr, _("Update"), G_CALLBACK(timezone_database_install_cb), tz);
 		}
 	else
 		{
+DEBUG_0("       "   );
 		button = pref_button_new(GTK_WIDGET(hbox), nullptr, _("Install"), G_CALLBACK(timezone_database_install_cb), tz);
 		}
 
@@ -4236,10 +4241,12 @@ static void timezone_database_install_cb(GtkWidget *widget, gpointer data)
 	auto tz = static_cast<TZData *>(data);
 	GFileIOStream *io_stream;
 
+DEBUG_0("       "   );
 	if (tz->tmp_g_file)
 		{
 		return;
 		}
+DEBUG_0("       "   );
 
 	g_autoptr(GError) error = nullptr;
 	tz->tmp_g_file = g_file_new_tmp("geeqie_timezone_XXXXXX", &io_stream, &error);
