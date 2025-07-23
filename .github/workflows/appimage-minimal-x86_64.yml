@@ -98,8 +98,8 @@ jobs:
       - name: Extract linuxdeploy to avoid FUSE
         run: |
           chmod +x linuxdeploy-x86_64.AppImage
-         ./linuxdeploy-x86_64.AppImage --appimage-extract
-         mv squashfs-root linuxdeploy
+          ./linuxdeploy-x86_64.AppImage --appimage-extract
+          mv squashfs-root linuxdeploy
 
       - name: Build AppImage
         run: |
