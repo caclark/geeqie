@@ -25,7 +25,7 @@ jobs:
           apt install -y yelp-tools
           #~ apt install -y cmake
           #~ apt install -y curl
-          #~ apt install -y file
+          apt install -y file
           #~ apt install -y libfuse2
           #~ apt install -y libglib2.0-dev
           apt install -y git
