@@ -106,8 +106,7 @@ jobs:
           ./linuxdeploy/AppRun --appdir ${{ github.workspace }}/AppDir \
             --desktop-file ${{ github.workspace }}/AppDir/usr/share/applications/org.geeqie.Geeqie.desktop \
             --plugin gtk \
-            --output appimage \
-            --custom-apprun=${{ github.workspace }}/scripts/appimage-custom-apprun.sh
+            --output appimage
           mv Geeqie-x86_64.AppImage Geeqie-minimal-latest-x86_64.AppImage
 
       - name: Create Release
