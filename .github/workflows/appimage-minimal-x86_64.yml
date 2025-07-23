@@ -83,6 +83,7 @@ jobs:
           chmod +x linuxdeploy-plugin-gtk.sh
           sed -i '/GDK_BACKEND/d' linuxdeploy-plugin-gtk.sh
           cp -r /usr/lib/x86_64-linux-gnu/gio ${{ github.workspace }}/AppDir/usr/lib/
+          ls -l ${{ github.workspace }}/AppDir/usr/lib/
 
       - name: Build AppImage
         run: |
