@@ -3,7 +3,10 @@ run-name: ${{ github.actor }} is running Geeqie minimal x86_64 AppImage build
 on: [push]
 jobs:
   Build-AppImage:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:25.04
+
     steps:
       - name: Install dependencies
         run: |
@@ -82,8 +85,6 @@ jobs:
           wget https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-gtk/master/linuxdeploy-plugin-gtk.sh
           chmod +x linuxdeploy-plugin-gtk.sh
           sed -i '/GDK_BACKEND/d' linuxdeploy-plugin-gtk.sh
-          cp -Lr /usr/lib/x86_64-linux-gnu/ ${{ github.workspace }}/AppDir/usr/lib/
-          ls -l ${{ github.workspace }}/AppDir/usr/lib/
 
       - name: Build AppImage
         run: |
