@@ -95,9 +95,15 @@ jobs:
           chmod +x linuxdeploy-plugin-gtk.sh
           sed -i '/GDK_BACKEND/d' linuxdeploy-plugin-gtk.sh
 
+      - name: Extract linuxdeploy to avoid FUSE
+        run: |
+          chmod +x linuxdeploy-x86_64.AppImage
+         ./linuxdeploy-x86_64.AppImage --appimage-extract
+         mv squashfs-root linuxdeploy
+
       - name: Build AppImage
         run: |
-          ./linuxdeploy-x86_64.AppImage --appdir ${{ github.workspace }}/AppDir \
+          ./linuxdeploy/AppRun --appdir ${{ github.workspace }}/AppDir \
             --desktop-file ${{ github.workspace }}/AppDir/usr/share/applications/org.geeqie.Geeqie.desktop \
             --plugin gtk \
             --output appimage \
