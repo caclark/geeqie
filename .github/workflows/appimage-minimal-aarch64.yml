@@ -10,6 +10,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - run: yes | apt-get update
+      - run: yes | apt-get install sudo
       - name: Set up ARM64 build environment
         uses: pguyot/arm-runner-action@v2.6.5
         with:
