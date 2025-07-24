@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up ARM64 build environment
-        uses: pguyot/arm-runner-action@v2.6.4
+        uses: pguyot/arm-runner-action@v2.6.5
         with:
           base_image: raspios_lite_arm64:latest
           cpu: cortex-a53
@@ -24,6 +24,7 @@ jobs:
 # that Wayland has problems. Delete this and let the user choose.
           commands: |
             yes | apt-get update
+            yes | apt-get install sudo
             yes | apt-get install build-essential
             yes | apt-get install curl
             yes | apt-get install file
