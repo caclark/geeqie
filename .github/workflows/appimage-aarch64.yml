@@ -10,8 +10,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - run: git fetch --tags --force
-      - run: git fetch --depth=1000000
       - uses: pguyot/arm-runner-action@v2.6.5
         with:
           base_image: raspios_lite_arm64:latest
@@ -59,6 +57,8 @@ jobs:
             yes | apt-get install python3-wheel
             yes | apt-get install wget fuse
             yes | apt-get install yelp-tools
+            git fetch --tags --force
+            git fetch --depth=1000000
             mkdir -p $GITHUB_WORKSPACE/AppDir
             mkdir -p $GITHUB_WORKSPACE/AppDir/usr
             meson setup \
