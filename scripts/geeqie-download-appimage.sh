@@ -29,7 +29,7 @@
 ## Downloads will not be made unless the server version is newer than the local file.
 ##
 
-version="2025-07-17"
+version="2025-07-24"
 backups=3
 
 show_help()
@@ -327,6 +327,15 @@ then
 
 		cd ..
 		ln --symbolic --force "./Geeqie$minimal-latest-$architecture-AppImage/squashfs-root/AppRun" geeqie
+
+		# Fix problems in linuxdeploy
+		# https://github.com/linuxdeploy/linuxdeploy/issues/303
+		# https://github.com/linuxdeploy/linuxdeploy/issues/304
+		# shellcheck disable=SC2016
+		sed -i '/^this_dir/ c\this_dir=$(dirname "$(readlink -f "$BASH_SOURCE")")' "./Geeqie$minimal-latest-$architecture-AppImage/squashfs-root/AppRun"
+
+		# shellcheck disable=SC2016
+		sed -i '/^exec/ c\exec $(readlink -f $this_dir/AppRun.wrapped) "$@"' "./Geeqie$minimal-latest-$architecture-AppImage/squashfs-root/AppRun"
 	else
 		ln --symbolic --force "Geeqie$minimal-latest-$architecture.AppImage" geeqie
 	fi

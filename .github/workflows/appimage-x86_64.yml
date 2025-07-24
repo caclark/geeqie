@@ -3,10 +3,10 @@ run-name: ${{ github.actor }} is running Geeqie x86_64 AppImage build
 on: [push]
 jobs:
   Build-AppImage:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
 
     container:
-      image: ubuntu:25.04
+      image: ubuntu:rolling
 
     steps:
       - name: Install dependencies
@@ -17,9 +17,11 @@ jobs:
           apt install -y curl
           apt install -y docbook-xsl
           apt install -y evince
+          apt install -y file
           apt install -y fop
           apt install -y fuse
           apt install -y gettext
+          apt install -y git
           apt install -y libarchive-dev
           apt install -y libcfitsio-dev
           apt install -y libchamplain-0.12-dev
@@ -47,8 +49,6 @@ jobs:
           apt install -y wget
           apt install -y xsltproc
           apt install -y yelp-tools
-          apt install -y file
-          apt install -y git
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -80,6 +80,8 @@ jobs:
       - name: Ninja compile
         run: DESTDIR=${{ github.workspace }}/AppDir ninja -C build install
 
+# The linuxdeploy-plugin-gtk forces the backend to be X11, as it was considered
+# that Wayland has problems. Delete this and let the user choose.
       - name: Download linuxdeploy and plugin
         run: |
           wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
