@@ -58,6 +58,8 @@ jobs:
             yes | apt-get install python3-wheel
             yes | apt-get install wget fuse
             yes | apt-get install yelp-tools
+            yes | apt-get install libjxl-dev
+            yes | apt-get install libcfitsio-dev
             git fetch --tags --force
             git fetch --depth=1000000
             mkdir -p $GITHUB_WORKSPACE/AppDir

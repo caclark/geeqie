@@ -298,8 +298,9 @@ then
 fi
 
 log_file=$(mktemp "${TMPDIR:-/tmp}/geeqie.XXXXXXXXXX")
+#~ https://github.com/caclark/geeqie/releases/download/continuous/Geeqie-latest-x86_64.AppImage
 
-wget --no-verbose --show-progress --backups="$backups" --output-file="$log_file" --timestamping "https://github.com/BestImageViewer/geeqie/releases/download/continuous/Geeqie$minimal-latest-$architecture.AppImage"
+wget --no-verbose --show-progress --backups="$backups" --output-file="$log_file" --timestamping "https://github.com/caclark/geeqie/releases/download/continuous/Geeqie$minimal-latest-$architecture.AppImage"
 
 download_size=$(stat --printf "%s" "$log_file")
 rm "$log_file"

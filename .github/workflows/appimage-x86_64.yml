@@ -49,6 +49,8 @@ jobs:
           apt install -y wget
           apt install -y xsltproc
           apt install -y yelp-tools
+          apt install -y libjxl-dev
+          apt install -y libcfitsio-dev
 
       - name: Checkout
         uses: actions/checkout@v4
