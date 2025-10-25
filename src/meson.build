@@ -355,11 +355,13 @@ if conf_data.get('HAVE_LCMS', 0) == 1
 endif
 
 # Required for snaps
+#~ net_deps = [
+#~   dependency('glib-2.0'),
+#~   dependency('gobject-2.0'),
+#~   dependency('gio-2.0'),
+#~   dependency('libsoup-3.0'),
+#~ ]
 net_deps = [
-  dependency('glib-2.0'),
-  dependency('gobject-2.0'),
-  dependency('gio-2.0'),
-  dependency('libsoup-3.0'),
 ]
 
 geeqie_exe = executable('geeqie', project_sources,
