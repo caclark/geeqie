@@ -25,6 +25,9 @@ jobs:
           apt install -y patchelf
           apt install -y wget
           apt install -y yelp-tools
+          DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            python3 python3-pip python3-venv \
+            ninja-build meson  # ← avoid pip ninja; use distro ninja
 
       - name: Checkout
         uses: actions/checkout@v4
