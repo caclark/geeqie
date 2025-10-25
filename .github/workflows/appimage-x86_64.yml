@@ -3,7 +3,7 @@ run-name: ${{ github.actor }} is running Geeqie x86_64 AppImage build
 on: [push]
 jobs:
   Build-AppImage:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     container:
       image: ubuntu:rolling
