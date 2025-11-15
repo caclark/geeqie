@@ -3602,12 +3602,10 @@ static void dupe_second_set_toggle_cb(GtkWidget *widget, gpointer data)
 	if (dw->second_set)
 		{
 		dupe_second_update_status(dw);
-		gtk_grid_set_column_spacing(GTK_GRID(dw->table), PREF_PAD_GAP);
 		gtk_widget_show(dw->second_vbox);
 		}
 	else
 		{
-		gtk_grid_set_column_spacing(GTK_GRID(dw->table), 0);
 		gtk_widget_hide(dw->second_vbox);
 		dupe_second_clear(dw);
 		}
@@ -4111,7 +4109,8 @@ static void dupe_window_get_geometry(DupeWindow *dw)
 	if (!dw || !lw) return;
 
 	window = gtk_widget_get_window(dw->window);
-	lw->options.dupe_window = window_get_position_geometry(window);
+	lw->options.dupe_window.rect = window_get_position_geometry(window);
+	lw->options.dupe_window.vdivider_pos = gtk_paned_get_position(GTK_PANED(dw->paned));
 }
 
 void dupe_window_close(DupeWindow *dw)
@@ -4310,8 +4309,8 @@ DupeWindow *dupe_window_new()
 	LayoutWindow *lw = get_current_layout();
 	if (lw && options->save_window_positions)
 		{
-		gtk_window_set_default_size(GTK_WINDOW(dw->window), lw->options.dupe_window.width, lw->options.dupe_window.height);
-		gq_gtk_window_move(GTK_WINDOW(dw->window), lw->options.dupe_window.x, lw->options.dupe_window.y);
+		gtk_window_set_default_size(GTK_WINDOW(dw->window), lw->options.dupe_window.rect.width, lw->options.dupe_window.rect.height);
+		gq_gtk_window_move(GTK_WINDOW(dw->window), lw->options.dupe_window.rect.x, lw->options.dupe_window.rect.y);
 		}
 	else
 		{
@@ -4330,16 +4329,17 @@ DupeWindow *dupe_window_new()
 	gq_gtk_container_add(dw->window, vbox);
 	gtk_widget_show(vbox);
 
-	dw->table = gtk_grid_new();
-	gq_gtk_box_pack_start(GTK_BOX(vbox), dw->table, TRUE, TRUE, 0);
-	gtk_grid_set_row_homogeneous(GTK_GRID(dw->table), TRUE);
-	gtk_grid_set_column_homogeneous(GTK_GRID(dw->table), TRUE);
-	gtk_widget_show(dw->table);
+	dw->paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+	if (lw && options->save_window_positions && (lw->options.dupe_window.vdivider_pos != 0))
+		{
+		gtk_paned_set_position(GTK_PANED(dw->paned), lw->options.dupe_window.vdivider_pos);
+		}
+	gq_gtk_box_pack_start(GTK_BOX(vbox), dw->paned, TRUE, TRUE, 0);
+	gtk_widget_show(dw->paned);
 
 	scrolled = gq_gtk_scrolled_window_new(nullptr, nullptr);
 	gq_gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(scrolled), GTK_SHADOW_IN);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	gtk_grid_attach(GTK_GRID(dw->table), scrolled, 0, 0, 2, 1);
 	gtk_widget_show(scrolled);
 
 	store = gtk_list_store_new(DUPE_COLUMN_COUNT, G_TYPE_POINTER, G_TYPE_STRING, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_INT, G_TYPE_INT);
@@ -4382,15 +4382,13 @@ DupeWindow *dupe_window_new()
 	gtk_widget_show(dw->listview);
 
 	dw->second_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-	gtk_grid_attach(GTK_GRID(dw->table), dw->second_vbox, 2, 0, 3, 1);
+
+	gtk_paned_pack1(GTK_PANED(dw->paned), scrolled, TRUE, FALSE);
+	gtk_paned_pack2(GTK_PANED(dw->paned), dw->second_vbox, TRUE, FALSE);
+
 	if (dw->second_set)
 		{
-		gtk_grid_set_column_spacing(GTK_GRID(dw->table), PREF_PAD_GAP);
 		gtk_widget_show(dw->second_vbox);
-		}
-	else
-		{
-		gtk_grid_set_column_spacing(GTK_GRID(dw->table), 0);
 		}
 
 	scrolled = gq_gtk_scrolled_window_new(nullptr, nullptr);

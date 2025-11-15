@@ -110,7 +110,10 @@ struct LayoutOptions
 
 	GdkRectangle search_window;
 
-	GdkRectangle dupe_window;
+	struct {
+		GdkRectangle rect;
+		gint vdivider_pos;
+	} dupe_window;
 
 	GdkRectangle advanced_exif_window;
 

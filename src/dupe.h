@@ -98,7 +98,7 @@ struct DupeWindow
 	DupeMatchType match_mask;	/**< mask of things to check for match */
 
 	GtkWidget *window;
-	GtkWidget *table;
+	GtkWidget *paned;
 	GtkWidget *listview;
 	GtkWidget *combo;
 	GtkWidget *status_label;

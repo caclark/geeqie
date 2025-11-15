@@ -195,10 +195,11 @@ void layout_load_attributes(LayoutOptions &lop, const gchar **attribute_names, c
 		if (READ_INT_FULL("search_window.w", lop.search_window.width)) continue;
 		if (READ_INT_FULL("search_window.h", lop.search_window.height)) continue;
 
-		if (READ_INT(lop, dupe_window.x)) continue;
-		if (READ_INT(lop, dupe_window.y)) continue;
-		if (READ_INT_FULL("dupe_window.w", lop.dupe_window.width)) continue;
-		if (READ_INT_FULL("dupe_window.h", lop.dupe_window.height)) continue;
+		if (READ_INT_FULL("dupe_window.x", lop.dupe_window.rect.x)) continue;
+		if (READ_INT_FULL("dupe_window.y", lop.dupe_window.rect.y)) continue;
+		if (READ_INT_FULL("dupe_window.w", lop.dupe_window.rect.width)) continue;
+		if (READ_INT_FULL("dupe_window.h", lop.dupe_window.rect.height)) continue;
+		if (READ_INT(lop, dupe_window.vdivider_pos)) continue;
 
 		if (READ_INT(lop, advanced_exif_window.x)) continue;
 		if (READ_INT(lop, advanced_exif_window.y)) continue;
@@ -234,7 +235,7 @@ LayoutOptions init_layout_options(const gchar **attribute_names, const gchar **a
 	lop.main_window.rect = {0, 0, 720, 540};
 	lop.main_window.vdivider_pos = 200;
 	lop.search_window = {100, 100, 700, 650};
-	lop.dupe_window = {100, 100, 800, 400};
+	lop.dupe_window.rect = {100, 100, 800, 400};
 	lop.advanced_exif_window = {0, 0, 900, 600};
 	lop.folder_window.vdivider_pos = 100;
 	lop.order = g_strdup("123");
@@ -2769,10 +2770,11 @@ static void layout_write_attributes(const LayoutOptions &lop, GString *outstr, g
 	WRITE_NL(); WRITE_INT_FULL("search_window.w", lop.search_window.width);
 	WRITE_NL(); WRITE_INT_FULL("search_window.h", lop.search_window.height);
 
-	WRITE_NL(); WRITE_INT(lop, dupe_window.x);
-	WRITE_NL(); WRITE_INT(lop, dupe_window.y);
-	WRITE_NL(); WRITE_INT_FULL("dupe_window.w", lop.dupe_window.width);
-	WRITE_NL(); WRITE_INT_FULL("dupe_window.h", lop.dupe_window.height);
+	WRITE_NL(); WRITE_INT_FULL("dupe_window.x", lop.dupe_window.rect.x);
+	WRITE_NL(); WRITE_INT_FULL("dupe_window.y", lop.dupe_window.rect.y);
+	WRITE_NL(); WRITE_INT_FULL("dupe_window.w", lop.dupe_window.rect.width);
+	WRITE_NL(); WRITE_INT_FULL("dupe_window.h", lop.dupe_window.rect.height);
+	WRITE_NL(); WRITE_INT(lop, dupe_window.vdivider_pos);
 
 	WRITE_NL(); WRITE_INT(lop, advanced_exif_window.x);
 	WRITE_NL(); WRITE_INT(lop, advanced_exif_window.y);
