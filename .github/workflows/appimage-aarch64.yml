@@ -56,7 +56,6 @@ jobs:
             mkdir -p $GITHUB_WORKSPACE/AppDir/usr
             meson setup \
               -Ddoxygen=disabled \
-              -Dextended_stacktrace=disabled \
               -Dunit_tests=disabled \
               -Dyelp-build=disabled \
               -Dprefix=$GITHUB_WORKSPACE/AppDir/usr build

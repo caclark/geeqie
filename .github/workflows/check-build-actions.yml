@@ -48,7 +48,6 @@ jobs:
           -Dexecinfo=disabled
           -Dexiv2=disabled
           -Dexr=disabled
-          -Dextended_stacktrace=disabled
           -Dfits=disabled
           -Dgit=disabled
           -Dgps-map=disabled
@@ -110,7 +109,6 @@ jobs:
           -Dexecinfo=disabled
           -Dexiv2=disabled
           -Dexr=disabled
-          -Dextended_stacktrace=disabled
           -Dfits=disabled
           -Dgit=disabled
           -Dgps-map=disabled
