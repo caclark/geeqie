@@ -1045,7 +1045,7 @@ Version: Geeqie "), VERSION, nullptr);
     g_action_map_add_action(G_ACTION_MAP(app), G_ACTION(config_file_error_notification_action));
 
 	status = g_application_run(G_APPLICATION(app), argc, argv);
-
+// test
 	g_object_unref(app);
 
 	return status;
