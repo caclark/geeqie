@@ -27,6 +27,7 @@ apps:
       - bin/fix-platform-order.sh
       - bin/auto-backend.sh
       - bin/env-imagemagick.sh
+      - bin/set-xdg-vars.sh
     command: usr/bin/geeqie
     extensions: [ gnome ]
     environment:
@@ -239,3 +240,4 @@ parts:
       install -Dm755 snap/local/auto-backend.sh    "$CRAFT_PART_INSTALL/bin/auto-backend.sh"
       install -Dm755 snap/local/force-wayland.sh   "$CRAFT_PART_INSTALL/bin/force-wayland.sh"
       install -Dm755 snap/local/force-x11.sh       "$CRAFT_PART_INSTALL/bin/force-x11.sh"
+      install -Dm755 snap/local/set-xdg-vars.sh "$CRAFT_PART_INSTALL/bin/set-xdg-vars.sh"
