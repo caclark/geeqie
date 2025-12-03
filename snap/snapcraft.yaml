@@ -38,7 +38,16 @@ apps:
       MAGICK_HOME: "$SNAP/usr"
       PATH: "$SNAP/usr/bin:$SNAP/bin:$PATH"
       GDK_PIXBUF_MODULE_FILE: "$SNAP_USER_COMMON/.cache/gdk-pixbuf-loaders.cache"
-    plugs: [ home, removable-media, gsettings, wayland, x11, opengl, network ]
+    plugs:
+      - home
+      - removable-media
+      - gsettings
+      - wayland
+      - x11
+      - opengl
+      - network
+      - desktop
+      - desktop-legacy
 
   wayland:
     command-chain:
@@ -55,7 +64,16 @@ apps:
       MAGICK_CODER_MODULE_PATH: "$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/ImageMagick-6/modules-Q16/coders:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/ImageMagick-6.9.12/modules-Q16/coders"
       MAGICK_HOME: "$SNAP/usr"
       PATH: "$SNAP/usr/bin:$SNAP/bin:$PATH"
-    plugs: [ home, removable-media, gsettings, wayland, x11, opengl, network ]
+    plugs:
+      - home
+      - removable-media
+      - gsettings
+      - wayland
+      - x11
+      - opengl
+      - network
+      - desktop
+      - desktop-legacy
 
   x11:
     command-chain:
@@ -72,7 +90,16 @@ apps:
       MAGICK_CODER_MODULE_PATH: "$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/ImageMagick-6/modules-Q16/coders:$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/ImageMagick-6.9.12/modules-Q16/coders"
       MAGICK_HOME: "$SNAP/usr"
       PATH: "$SNAP/usr/bin:$SNAP/bin:$PATH"
-    plugs: [ home, removable-media, gsettings, wayland, x11, opengl, network ]
+    plugs:
+      - home
+      - removable-media
+      - gsettings
+      - wayland
+      - x11
+      - opengl
+      - network
+      - desktop
+      - desktop-legacy
 
 slots:
   geeqie-dbus:
