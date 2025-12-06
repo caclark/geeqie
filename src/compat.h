@@ -44,6 +44,7 @@
 	#define gq_gtk_widget_queue_draw_area(widget, x, y, width, height) gtk_widget_queue_draw(widget);
 	#define gq_gtk_widget_show_all(widget) ;
 	#define gq_gtk_window_move(window, x, y) ;
+	#define gq_gtk_window_resize(window, width, height) gtk_window_set_default_size(window, width, height)
 	#define gq_gtk_window_set_keep_above(window, setting) ;
 	#define gq_gtk_window_set_position(window, position) ;
 	#define gq_gtk_window_fullscreen_on_monitor(window, monitor) ;
@@ -58,6 +59,7 @@
 	#define gq_gtk_widget_queue_draw_area(widget, x, y, width, height) gtk_widget_queue_draw_area(widget, x, y, width, height);
 	#define gq_gtk_widget_show_all(widget) gtk_widget_show_all(widget)
 	#define gq_gtk_window_move(window, x, y) gtk_window_move(window, x, y)
+	#define gq_gtk_window_resize(window, width, height)gtk_window_resize(window, width, height)
 	#define gq_gtk_window_set_keep_above(window, setting) gtk_window_set_keep_above(window, setting)
 	#define gq_gtk_window_set_position(window, position) gtk_window_set_position(window, position)
 	#define gq_gtk_window_fullscreen_on_monitor(window, screen, monitor) gtk_window_fullscreen_on_monitor(window, screen, monitor)
