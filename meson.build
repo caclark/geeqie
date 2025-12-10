@@ -29,7 +29,7 @@
 # [gq_]appdir   /usr/local/share/geeqie/            *   org,geeqie.template.desktop
 # desktopdir    /usr/local/share/geeqie/applications    plugin desktop files
 # appdatadir    /usr/local/share/metainfo               org.geeqie.Geeqie.appdata.xml
-# icondir       /usr/local/share/pixmaps                geeqie.png icon
+# icondir       /usr/local/share/icons/hicolor/scalable/apps  geeqie.svg icon
 # [gq_]helpdir  /usr/local/share/doc/geeqie         *   readme files etc.
 # [gq_]htmldir  /usr/local/share/doc/geeqie/html    *   help files
 # gq_localedir  /usr/locale/share/locale
@@ -125,7 +125,7 @@ appdatadir = join_paths(datadir, 'metainfo')
 desktopdir = join_paths(datadir, meson.project_name(), 'applications')
 helpdir = join_paths(prefix, gq_helpdir)
 htmldir = join_paths(prefix, gq_htmldir)
-icondir = join_paths(datadir, 'pixmaps')
+icondir = join_paths(datadir, 'icons/hicolor/scalable/apps/')
 mandir1 = join_paths(datadir, 'man', 'man1')
 completionsdir = join_paths(datadir, 'bash-completion', 'completions')
 podir = join_paths(meson.project_source_root(), 'po')
@@ -681,7 +681,7 @@ elif fs.exists('ChangeLog.html')
     summary({'ChangeLog' : ['ChangeLog, ChangeLog.html installed from dist:', true]}, section : 'Documentation', bool_yn : true)
 endif
 
-install_data('geeqie.png', install_dir : icondir)
+install_data('src/icons/geeqie.svg', install_dir : icondir)
 install_data('geeqie.1', install_dir : mandir1)
 
 i18n.merge_file(

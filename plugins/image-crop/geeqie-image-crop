@@ -53,7 +53,7 @@ process_plain ()
 	fi
 }
 
-export window_icon="/usr/local/share/pixmaps/geeqie.png"
+export window_icon="/usr/local/share/icons/hicolor/scalable/apps/geeqie.svg"
 export title="Geeqie crop image"
 
 if [ -x "$(command -v convert)" ]

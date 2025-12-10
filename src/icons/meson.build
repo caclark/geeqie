@@ -12,5 +12,3 @@
 # GNU General Public License for more details.
 
 project_sources += gnome.compile_resources('icons', 'icons.gresource.xml')
-
-subdir('svg')

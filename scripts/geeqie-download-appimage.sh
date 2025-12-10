@@ -243,9 +243,9 @@ then
 
 	app=$(find "$HOME/bin/" -name "Geeqie*latest*\.AppImage" -print | sort --reverse | head -1)
 	$app --appimage-extract "usr/share/applications/org.geeqie.Geeqie.desktop" > /dev/null
-	$app --appimage-extract "usr/share/pixmaps/geeqie.png" > /dev/null
+	$app --appimage-extract "usr/share/icons/hicolor/scalable/apps/geeqie.svg" > /dev/null
 	xdg-desktop-icon install --novendor "squashfs-root/usr/share/applications/org.geeqie.Geeqie.desktop"
-	xdg-icon-resource install --novendor --size 48 "squashfs-root/usr/share/pixmaps/geeqie.png"
+	xdg-icon-resource install --novendor --size 48 "squashfs-root/usr/share/icons/hicolor/scalable/apps/geeqie.svg"
 	xdg-desktop-menu install --novendor "squashfs-root/usr/share/applications/org.geeqie.Geeqie.desktop"
 	rm --recursive --force "$tmp_dir"
 

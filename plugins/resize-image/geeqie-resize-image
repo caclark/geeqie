@@ -12,19 +12,19 @@ current_dir=$(dirname "$(readlink -f "$0")")
 
 if ! command -v yad > /dev/null
 then
-	zenity --window-icon=/usr/local/share/pixmaps/geeqie.png --info --title "Geeqie Resize" --text="yad and ImageMagick are required\n\nyad is not installed"
+	zenity --window-icon=/usr/local/share/icons/hicolor/scalable/apps/geeqie.svg --info --title "Geeqie Resize" --text="yad and ImageMagick are required\n\nyad is not installed"
 	exit 0
 fi
 
 if ! command -v convert > /dev/null
 then
-	zenity --window-icon=/usr/local/share/pixmaps/geeqie.png --info --title "Geeqie Resize" --text="yad and ImageMagick are required\n\nImageMagick is not installed"
+	zenity --window-icon=/usr/local/share/icons/hicolor/scalable/apps/geeqie.svg --info --title "Geeqie Resize" --text="yad and ImageMagick are required\n\nImageMagick is not installed"
 	exit 0
 fi
 
 if [ -z "$1" ]
 then
-	yad --window-icon=/usr/local/share/pixmaps/geeqie.png --geometry=400 --image dialog-warning --title "Geeqie Resize" --button=gtk-ok:0 --text "\nNo input file was given."
+	yad --window-icon=/usr/local/share/icons/hicolor/scalable/apps/geeqie.svg --geometry=400 --image dialog-warning --title "Geeqie Resize" --button=gtk-ok:0 --text "\nNo input file was given."
 	exit 0
 fi
 
@@ -49,7 +49,7 @@ then
 fi
 
 
-selection=$(yad --window-icon=/usr/local/share/pixmaps/geeqie.png \
+selection=$(yad --window-icon=/usr/local/share/icons/hicolor/scalable/apps/geeqie.svg \
 --center                                                          \
 --title="Resize $1"                                               \
 --button=gtk-help:"$current_dir"/resize-help.sh                   \
@@ -88,7 +88,7 @@ then
 else
 	if [ -f "$file" ]
 	then
-		if ! yad --window-icon=/usr/local/share/pixmaps/geeqie.png --geometry=300 --image dialog-warning --title "Geeqie Resize" --text "\nOutput file already exists.\nOverwrite?"
+		if ! yad --window-icon=/usr/local/share/icons/hicolor/scalable/apps/geeqie.svg --geometry=300 --image dialog-warning --title "Geeqie Resize" --text "\nOutput file already exists.\nOverwrite?"
 		then
 			exit 0
 		fi
@@ -112,7 +112,7 @@ fi
 
 tmp_file=$(mktemp "${TMPDIR:-/tmp}/geeqie.XXXXXXXXXX")
 
-yad --window-icon=/usr/local/share/pixmaps/geeqie.png --geometry=300 --image dialog-information --title "Geeqie Resize" --button=OK:0 --text "Running Downsize...." &
+yad --window-icon=/usr/local/share/icons/hicolor/scalable/apps/geeqie.svg --geometry=300 --image dialog-information --title "Geeqie Resize" --button=OK:0 --text "Running Downsize...." &
 info_id="$!"
 
 result=$( { "$current_dir"/downsize -s "$size" -t "$tolerance" -m "$iterations" -c "$copy" -S "$strip" "$1" "$new_filename" > "$tmp_file"; } 2>&1 )
@@ -122,7 +122,7 @@ then
 	kill "$info_id"
 	rm "$tmp_file"
 
-	yad --window-icon=/usr/local/share/pixmaps/geeqie.png --geometry=400 --image dialog-warning --title "Geeqie Resize" --button=gtk-ok:0 --text "Downsize failed.\n\nIf the filetype is not supported by Downsize,\ntry the Export plugin to get a jpeg.\n\nDownsize error message:\n$result"
+	yad --window-icon=/usr/local/share/icons/hicolor/scalable/apps/geeqie.svg --geometry=400 --image dialog-warning --title "Geeqie Resize" --button=gtk-ok:0 --text "Downsize failed.\n\nIf the filetype is not supported by Downsize,\ntry the Export plugin to get a jpeg.\n\nDownsize error message:\n$result"
 	exit 0
 fi
 
@@ -136,7 +136,7 @@ fi
 
 if [ "$show_computation" = "TRUE" ]
 then
-	yad --window-icon=/usr/local/share/pixmaps/geeqie.png --title "Geeqie Resize computation" --text="$new_filename\n\n$(cat "$tmp_file")" --button=gtk-ok:0
+	yad --window-icon=/usr/local/share/icons/hicolor/scalable/apps/geeqie.svg --title "Geeqie Resize computation" --text="$new_filename\n\n$(cat "$tmp_file")" --button=gtk-ok:0
 fi
 
 rm "$tmp_file"
