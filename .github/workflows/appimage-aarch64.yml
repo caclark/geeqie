@@ -69,7 +69,7 @@ jobs:
             sed -i '/GDK_BACKEND/d' linuxdeploy-plugin-gtk.sh
             tools/linuxdeploy-aarch64.AppImage \
               --desktop-file $GITHUB_WORKSPACE/AppDir/usr/share/applications/org.geeqie.Geeqie.desktop \
-              --icon-file $GITHUB_WORKSPACE/AppDir/usr/share/pixmaps/geeqie.png \
+              --icon-file $GITHUB_WORKSPACE/AppDir/usr/share/icons/hicolor/scalable/apps/geeqie.svg \
               --appdir $GITHUB_WORKSPACE/AppDir \
               --plugin gtk \
               --output appimage
