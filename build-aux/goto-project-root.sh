@@ -13,6 +13,7 @@ build-aux
 data
 doc
 po
+snap
 src
 "
 
