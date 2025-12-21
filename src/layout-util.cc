@@ -1491,7 +1491,7 @@ static void convert_keymap_template_to_file(const gint fd, const GPtrArray *keyb
 {
 	g_autoptr(GIOChannel) channel = g_io_channel_unix_new(fd);
 
-	g_autoptr(GInputStream) in_stream = g_resources_open_stream(GQ_RESOURCE_PATH_UI "/keymap-template.svg", G_RESOURCE_LOOKUP_FLAGS_NONE, nullptr);
+	g_autoptr(GInputStream) in_stream = g_resources_open_stream(GQ_RESOURCE_PATH_IMAGES "/keymap-template.svg", G_RESOURCE_LOOKUP_FLAGS_NONE, nullptr);
 	g_autoptr(GDataInputStream) data_stream = g_data_input_stream_new(in_stream);
 
 	gchar *template_line;
