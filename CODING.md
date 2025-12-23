@@ -200,6 +200,20 @@ Use glib types when possible (ie. gint and gchar instead of int and char).
 Use glib functions when possible (i.e. `g_ascii_isspace()` instead of `isspace()`).  
 Check if used functions are not deprecated.  
 
+### C++ style
+
+In the case that both the following lines are syntactically correct, in order to emphasise the use of a pointer use:
+
+```c
+auto *var = function();
+```
+
+and not:
+
+```c
+auto var = function();
+```
+
 ---
 
 ## Shell Script Style
