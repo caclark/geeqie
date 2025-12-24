@@ -379,7 +379,7 @@ then
 fi
 
 # If it looks like a Geeqie download folder, assume an update
-if [ -d ".git" ] && [ -d "src" ] && [ -f "geeqie.1" ]
+if [ -d ".git" ] && [ -d "src" ]
 then
 	mode="update"
 else
