@@ -872,14 +872,6 @@ static void button_size_allocate_cb(GtkWidget *button, GtkAllocation *allocation
 		}
 }
 
-static void spin_increase(GtkWidget *spin, gint value)
-{
-	GtkRequisition req;
-
-	gq_gtk_widget_size_request(spin, &req);
-	gtk_widget_set_size_request(spin, req.width + value, -1);
-}
-
 static void date_selection_destroy_cb(GtkWidget *, gpointer data)
 {
 	auto ds = static_cast<DateSelection *>(data);
@@ -931,8 +923,6 @@ GtkWidget *date_selection_new()
 		ds->spin_d = pref_spin_new(ds->box, nullptr, nullptr, 1, 31, 1, 0, 1, nullptr, nullptr);
 		ds->spin_y = pref_spin_new(ds->box, nullptr, nullptr, 1900, 9999, 1, 0, 1900, nullptr, nullptr);
 		}
-
-	spin_increase(ds->spin_y, 5);
 
 	ds->button = gtk_toggle_button_new();
 	g_signal_connect(G_OBJECT(ds->button), "size_allocate",
