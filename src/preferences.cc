@@ -54,7 +54,7 @@
 #include "filedata.h"
 #include "filefilter.h"
 #include "fullscreen.h"
-#include "gq-size.h"
+#include "geometry.h"
 #include "image.h"
 #include "img-view.h"
 #include "intl.h"

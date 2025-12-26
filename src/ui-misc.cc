@@ -35,6 +35,7 @@
 
 #include "compat-deprecated.h"
 #include "compat.h"
+#include "geometry.h"
 #include "history-list.h"
 #include "layout.h"
 #include "main-defines.h"
@@ -1346,7 +1347,7 @@ GdkPixbuf *gq_gtk_icon_theme_load_icon_copy(GtkIconTheme *icon_theme, const gcha
 	return gdk_pixbuf_copy(icon);
 }
 
-gboolean window_get_pointer_position(GdkWindow *window, GdkPoint &pos)
+gboolean window_get_pointer_position(GdkWindow *window, GqPoint &pos)
 {
 	GdkSeat *seat = gdk_display_get_default_seat(gdk_window_get_display(window));
 	GdkDevice *device = gdk_seat_get_pointer(seat);
@@ -1381,7 +1382,7 @@ GdkRectangle window_get_root_origin_geometry(GdkWindow *window)
 	return rect;
 }
 
-gboolean window_received_event(GdkWindow *window, GdkPoint event)
+gboolean window_received_event(GdkWindow *window, GqPoint event)
 {
 	gint x;
 	gint y;

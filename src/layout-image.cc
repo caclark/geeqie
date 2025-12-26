@@ -40,6 +40,7 @@
 #include "exif.h"
 #include "filedata.h"
 #include "fullscreen.h"
+#include "geometry.h"
 #include "history-list.h"
 #include "image-overlay.h"
 #include "image.h"
@@ -1965,7 +1966,7 @@ static void layout_status_update_pixel_cb(PixbufRenderer *pr, gpointer data)
 	pixbuf_renderer_get_image_size(pr, &width, &height);
 	if (width < 1 || height < 1) return;
 
-	GdkPoint pixel;
+	GqPoint pixel;
 	pixbuf_renderer_get_mouse_position(pr, pixel);
 
 	g_autofree gchar *text = nullptr;

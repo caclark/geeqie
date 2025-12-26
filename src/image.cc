@@ -35,7 +35,7 @@
 #include "exif.h"
 #include "filecache.h"
 #include "filedata.h"
-#include "gq-size.h"
+#include "geometry.h"
 #include "history-list.h"
 #include "image-load.h"
 #include "intl.h"
@@ -201,7 +201,7 @@ static void image_press_cb(PixbufRenderer *pr, GdkEventButton *event, gpointer d
 
 	if(options->draw_rectangle)
 		{
-		GdkPoint pixel;
+		GqPoint pixel;
 		pixbuf_renderer_get_mouse_position(pr, pixel);
 		selection_rectangle = SelectionRectangle(std::max(0, gint(event->x)), std::max(0, gint(event->y)), options->rectangle_draw_aspect_ratio);
 		image_start_x = std::max(0, pixel.x);
@@ -252,7 +252,7 @@ static void image_drag_cb(PixbufRenderer *pr, GdkEventMotion *event, gpointer da
 		{
 		pixbuf_renderer_get_image_size(pr, &width, &height);
 
-		GdkPoint pixel;
+		GqPoint pixel;
 		pixbuf_renderer_get_mouse_position(pr, pixel);
 
 		gint image_x_pixel = (pixel.x != -1) ? pixel.x : width;

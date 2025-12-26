@@ -37,6 +37,7 @@
 #include "dnd.h"
 #include "dupe.h"
 #include "filedata.h"
+#include "geometry.h"
 #include "img-view.h"
 #include "intl.h"
 #include "layout-image.h"
@@ -1519,7 +1520,7 @@ static void collection_table_scroll(CollectTable *ct, gboolean scroll)
 		}
 	else
 		{
-		const auto collection_table_auto_scroll_notify_cb = [ct](GtkWidget *, GdkPoint)
+		const auto collection_table_auto_scroll_notify_cb = [ct](GtkWidget *, GqPoint)
 		{
 			if (!ct->drop_idle_id)
 				{
