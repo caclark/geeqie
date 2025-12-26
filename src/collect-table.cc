@@ -917,7 +917,7 @@ static void collection_table_popup_print_cb(GtkWidget *, gpointer data)
 {
 	auto ct = static_cast<CollectTable *>(data);
 
-	print_window_new(collection_table_selection_get_list(ct), gtk_widget_get_toplevel(ct->listview));
+	print_window_new(collection_table_selection_get_list(ct), widget_get_toplevel(ct->listview));
 }
 
 static void collection_table_popup_show_names_cb(GtkWidget *, gpointer data)

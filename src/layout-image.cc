@@ -549,7 +549,7 @@ static GtkWidget *li_pop_menu_click_parent(GtkWidget *widget, LayoutWindow *lw)
 	GtkWidget *menu;
 	GtkWidget *parent;
 
-	menu = gtk_widget_get_toplevel(widget);
+	menu = widget_get_toplevel(widget);
 	if (!menu) return nullptr;
 
 	parent = static_cast<GtkWidget *>(g_object_get_data(G_OBJECT(menu), "click_parent"));
