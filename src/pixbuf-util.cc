@@ -628,8 +628,8 @@ static void pixbuf_copy_font(GdkPixbuf *src, gint sx, gint sy,
 
 	for (gint i = 0; i < h; i++)
 		{
-		guchar *sp = s_pix + (sy + i) * srs + sx * s_step;
-		guchar *dp = d_pix + (dy + i) * drs + dx * d_step;
+		guchar *sp = s_pix + ((sy + i) * srs) + (sx * s_step);
+		guchar *dp = d_pix + ((dy + i) * drs) + (dx * d_step);
 		for (gint j = 0; j < w; j++)
 			{
 			if (*sp)

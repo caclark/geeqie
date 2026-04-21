@@ -402,7 +402,7 @@ static bool pan_item_text_draw(const PanItem *pi, GdkPixbuf *pixbuf, GdkRectangl
 
 PanItem *pan_item_thumb_new(PanWindow *pw, FileData *fd, gint x, gint y)
 {
-	const gint size = pw->thumb_size + PAN_SHADOW_OFFSET * 2;
+	const gint size = pw->thumb_size + (PAN_SHADOW_OFFSET * 2);
 
 	PanItem *pi = pan_item_new(PAN_ITEM_THUMB, x, y, size, size);
 
