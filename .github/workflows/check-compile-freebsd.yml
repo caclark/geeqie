@@ -14,6 +14,18 @@ jobs:
         envs: 'CXXFLAGS'
         usesh: true
         prepare: |
+          # Force stable quarterly repo (fix pkg issues)
+          mkdir -p /usr/local/etc/pkg/repos
+          cat > /usr/local/etc/pkg/repos/FreeBSD.conf <<'EOF'
+          FreeBSD: {
+            url: "pkg+https://pkg.FreeBSD.org/${ABI}/quarterly",
+            mirror_type: "srv",
+            signature_type: "fingerprints",
+            fingerprints: "/usr/share/keys/pkg",
+            enabled: yes
+          }
+          EOF
+          pkg update -f
           pkg install -y meson pkgconf evdev-proto libgudev libxml++ bash libevdev
           pkg install -y desktop-file-utils gettext-tools libarchive
           pkg install -y curl
