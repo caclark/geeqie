@@ -36,7 +36,7 @@ jobs:
           apt install -y libgtk-3-dev
           apt install -y libheif-dev
           apt install -y libimath-dev
-          #~ apt install -y libjxl-dev
+          apt install -y libjxl-dev
           apt install -y liblua5.3-dev
           apt install -y libomp-dev
           apt install -y libopenexr-dev
