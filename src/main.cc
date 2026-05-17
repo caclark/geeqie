@@ -94,10 +94,10 @@ gchar *gq_prefix;
 gchar *gq_localedir;
 gchar *gq_helpdir;
 gchar *gq_htmldir;
-gchar *gq_appdir;
+ gchar *gq_appdir;
 gchar *gq_bindir;
 gchar *gq_executable_path;
-gchar *desktop_file_template;
+ gchar *desktop_file_template;
 gchar *instance_identifier;
 
 namespace
