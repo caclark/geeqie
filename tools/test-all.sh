@@ -98,3 +98,26 @@ else
 	printf "%s \033[1;31m FAIL \033[0m\n" "$tmpdir/testlog-options-enabled.txt"
 fi
 
+awk '
+/^================================$/ {
+	if (getline line) {
+		if (line == "GLib type warnings") {
+			print "================================"
+			print line
+
+			getline line
+			print line
+
+			while (getline line) {
+				print line
+
+				if (line ~ /^Total GLib type warnings: [0-9]+$/) {
+					getline line
+					print line
+					exit
+				}
+			}
+		}
+	}
+}
+' ./build/meson-logs/testlog.txt

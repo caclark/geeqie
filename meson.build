@@ -897,6 +897,22 @@ test('Ancillary files', test_ancillary_files_sh, args: [meson.current_source_dir
 
 summary({'Ancillary files' : ['Test runs:', true]}, section : 'Testing', bool_yn : true)
 
+# glib types checks
+cc_sources = []
+glib_types_check = find_program('check-glib-types.sh', dirs : buildauxdir, required : true)
+if glib_types_check.found()
+    foreach source_file : code_sources
+        if fs.name(source_file).endswith('.cc')
+            cc_sources += source_file
+        endif
+    endforeach
+    test('Glib Types', glib_types_check, args : [meson.project_source_root(), meson.project_build_root()] + cc_sources, timeout : 200, suite : 'analysis')
+
+    summary({'Glib Types' : ['Test runs:', true]}, section : 'Testing', bool_yn : true)
+else
+    summary({'Glib Types' : ['Test runs:', false]}, section : 'Testing', bool_yn : true)
+endif
+
 # Unit tests
 if conf_data.get('ENABLE_UNIT_TESTS', 0) == 1
     test('Unit tests', isolate_test_sh, args: [geeqie_exe.full_path(), '--run-unit-tests'], suite : 'unit')
